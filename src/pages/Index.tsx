@@ -36,48 +36,86 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-orange-400 flex flex-col items-center justify-center p-4">
-      {/* Token Address Section */}
-      <div className="mb-6 w-full max-w-lg">
+      {/* Road Signs */}
+      <div className="absolute top-10 left-10 transform -rotate-12">
         <div 
-          className="bg-purple-500 border-4 border-black p-4 transform -rotate-1 shadow-lg"
-          style={{ borderRadius: '12px' }}
+          className="bg-green-600 border-4 border-white p-4 shadow-lg"
+          style={{ 
+            borderRadius: '8px',
+            clipPath: 'polygon(10% 0%, 90% 0%, 100% 25%, 90% 100%, 10% 100%, 0% 25%)'
+          }}
         >
-          <h3 
-            className="text-lg font-black text-white mb-3 text-center transform rotate-1"
+          <div 
+            className="text-white font-black text-lg text-center"
             style={{ 
-              fontFamily: 'Comic Sans MS, cursive',
-              textShadow: '2px 2px 0px rgba(0,0,0,0.5)',
+              fontFamily: 'Impact, Arial Black, sans-serif',
+              textShadow: '2px 2px 0px rgba(0,0,0,0.8)',
               letterSpacing: '1px'
             }}
           >
-            TOKEN ADDRESS
-          </h3>
-          <div className="flex items-center gap-2 bg-white p-3 border-2 border-black rounded-lg">
-            <div 
-              className="flex-1 text-sm font-bold text-black break-all"
-              style={{ fontFamily: 'monospace' }}
-            >
-              {tokenAddress}
-            </div>
-            <button
-              onClick={copyToClipboard}
-              className="bg-green-500 hover:bg-green-600 text-white p-2 border-2 border-black rounded transform hover:rotate-1 transition-all duration-200 shadow-md"
-            >
-              <Copy size={16} />
-            </button>
+            MASK ON
+            <br />
+            ZONE
           </div>
-          {copied && (
-            <div 
-              className="text-center mt-2 text-white font-black transform rotate-2"
-              style={{ 
-                fontFamily: 'Comic Sans MS, cursive',
-                textShadow: '1px 1px 0px rgba(0,0,0,0.5)',
-                fontSize: '14px'
-              }}
-            >
-              COPIED! 🎉
-            </div>
-          )}
+        </div>
+      </div>
+
+      <div className="absolute top-20 right-10 transform rotate-6">
+        <div 
+          className="bg-yellow-400 border-4 border-black p-3 shadow-lg"
+          style={{ borderRadius: '8px' }}
+        >
+          <div 
+            className="text-black font-black text-base text-center"
+            style={{ 
+              fontFamily: 'Impact, Arial Black, sans-serif',
+              letterSpacing: '1px'
+            }}
+          >
+            ARMY OF
+            <br />
+            MASKS
+          </div>
+        </div>
+      </div>
+
+      <div className="absolute bottom-20 left-16 transform -rotate-6">
+        <div 
+          className="bg-red-600 border-4 border-white p-3 shadow-lg"
+          style={{ borderRadius: '8px' }}
+        >
+          <div 
+            className="text-white font-black text-sm text-center"
+            style={{ 
+              fontFamily: 'Impact, Arial Black, sans-serif',
+              textShadow: '2px 2px 0px rgba(0,0,0,0.8)',
+              letterSpacing: '1px'
+            }}
+          >
+            NO MASK
+            <br />
+            NO ENTRY
+          </div>
+        </div>
+      </div>
+
+      <div className="absolute bottom-32 right-20 transform rotate-12">
+        <div 
+          className="bg-blue-600 border-4 border-white p-3 shadow-lg"
+          style={{ borderRadius: '8px' }}
+        >
+          <div 
+            className="text-white font-black text-sm text-center"
+            style={{ 
+              fontFamily: 'Impact, Arial Black, sans-serif',
+              textShadow: '2px 2px 0px rgba(0,0,0,0.8)',
+              letterSpacing: '1px'
+            }}
+          >
+            PONKE
+            <br />
+            AHEAD
+          </div>
         </div>
       </div>
 
@@ -93,16 +131,6 @@ const Index = () => {
         >
           PUT YOUR MASK ON
         </h1>
-        <h2 
-          className="text-5xl md:text-7xl font-black text-black transform rotate-2"
-          style={{ 
-            fontFamily: 'Comic Sans MS, cursive',
-            textShadow: '4px 4px 0px rgba(0,0,0,0.4)',
-            letterSpacing: '3px'
-          }}
-        >
-          PONKE
-        </h2>
       </div>
 
       {/* Image Upload Area */}
@@ -164,6 +192,51 @@ const Index = () => {
                   P
                 </div>
               </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Token Address Section - MOVED BELOW IMAGE */}
+      <div className="mb-6 w-full max-w-lg">
+        <div 
+          className="bg-orange-500 border-4 border-black p-4 transform -rotate-1 shadow-lg"
+          style={{ borderRadius: '12px' }}
+        >
+          <h3 
+            className="text-lg font-black text-black mb-3 text-center transform rotate-1"
+            style={{ 
+              fontFamily: 'Comic Sans MS, cursive',
+              textShadow: '2px 2px 0px rgba(255,255,255,0.5)',
+              letterSpacing: '1px'
+            }}
+          >
+            TOKEN ADDRESS
+          </h3>
+          <div className="flex items-center gap-2 bg-white p-3 border-2 border-black rounded-lg">
+            <div 
+              className="flex-1 text-sm font-bold text-black break-all"
+              style={{ fontFamily: 'monospace' }}
+            >
+              {tokenAddress}
+            </div>
+            <button
+              onClick={copyToClipboard}
+              className="bg-green-500 hover:bg-green-600 text-white p-2 border-2 border-black rounded transform hover:rotate-1 transition-all duration-200 shadow-md"
+            >
+              <Copy size={16} />
+            </button>
+          </div>
+          {copied && (
+            <div 
+              className="text-center mt-2 text-black font-black transform rotate-2"
+              style={{ 
+                fontFamily: 'Comic Sans MS, cursive',
+                textShadow: '1px 1px 0px rgba(255,255,255,0.5)',
+                fontSize: '14px'
+              }}
+            >
+              COPIED! 🎉
             </div>
           )}
         </div>

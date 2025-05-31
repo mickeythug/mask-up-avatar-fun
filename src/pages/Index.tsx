@@ -1,11 +1,14 @@
-
 import React from 'react';
 import PFPDownloader from '../components/PFPDownloader';
 import ContractAddress from '../components/ContractAddress';
+import Socials from '../components/Socials';
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-300 via-orange-400 to-orange-500">
+    <div className="min-h-screen bg-gradient-to-br from-orange-300 via-orange-400 to-orange-500 relative">
+      {/* Socials in top corner */}
+      <Socials />
+      
       <div className="flex items-center justify-center p-4 sm:p-6 md:p-8 min-h-screen">
         <div className="w-full max-w-4xl mx-auto text-center">
           {/* Title */}

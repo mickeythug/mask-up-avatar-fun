@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Slider } from './ui/slider';
@@ -25,8 +24,55 @@ const MaskCustomizer = () => {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const changeImageInputRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const processImageUpload = (imageUrl: string) => {
+    setUploadedImage(imageUrl);
+    
+    // Get image dimensions and calculate display size
+    const img = new Image();
+    img.onload = () => {
+      setImageSize({ width: img.width, height: img.height });
+      
+      // Calculate display dimensions that fit well in the container
+      const maxWidth = 800;
+      const maxHeight = 600;
+      const aspectRatio = img.width / img.height;
+      
+      let displayWidth = img.width;
+      let displayHeight = img.height;
+      
+      // Scale down if image is too large
+      if (displayWidth > maxWidth || displayHeight > maxHeight) {
+        if (aspectRatio > 1) {
+          // Landscape
+          displayWidth = Math.min(maxWidth, displayWidth);
+          displayHeight = displayWidth / aspectRatio;
+        } else {
+          // Portrait
+          displayHeight = Math.min(maxHeight, displayHeight);
+          displayWidth = displayHeight * aspectRatio;
+        }
+      }
+      
+      // Ensure minimum size for usability
+      const minSize = 400;
+      if (displayWidth < minSize && displayHeight < minSize) {
+        if (aspectRatio > 1) {
+          displayWidth = minSize;
+          displayHeight = minSize / aspectRatio;
+        } else {
+          displayHeight = minSize;
+          displayWidth = minSize * aspectRatio;
+        }
+      }
+      
+      setDisplaySize({ width: displayWidth, height: displayHeight });
+    };
+    img.src = imageUrl;
+  };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -34,52 +80,27 @@ const MaskCustomizer = () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const imageUrl = e.target?.result as string;
-        setUploadedImage(imageUrl);
-        
-        // Get image dimensions and calculate display size
-        const img = new Image();
-        img.onload = () => {
-          setImageSize({ width: img.width, height: img.height });
-          
-          // Calculate display dimensions that fit well in the container
-          const maxWidth = 800;
-          const maxHeight = 600;
-          const aspectRatio = img.width / img.height;
-          
-          let displayWidth = img.width;
-          let displayHeight = img.height;
-          
-          // Scale down if image is too large
-          if (displayWidth > maxWidth || displayHeight > maxHeight) {
-            if (aspectRatio > 1) {
-              // Landscape
-              displayWidth = Math.min(maxWidth, displayWidth);
-              displayHeight = displayWidth / aspectRatio;
-            } else {
-              // Portrait
-              displayHeight = Math.min(maxHeight, displayHeight);
-              displayWidth = displayHeight * aspectRatio;
-            }
-          }
-          
-          // Ensure minimum size for usability
-          const minSize = 400;
-          if (displayWidth < minSize && displayHeight < minSize) {
-            if (aspectRatio > 1) {
-              displayWidth = minSize;
-              displayHeight = minSize / aspectRatio;
-            } else {
-              displayHeight = minSize;
-              displayWidth = minSize * aspectRatio;
-            }
-          }
-          
-          setDisplaySize({ width: displayWidth, height: displayHeight });
-        };
-        img.src = imageUrl;
+        processImageUpload(imageUrl);
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleChangeImage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const imageUrl = e.target?.result as string;
+        // Clear existing traits when changing image
+        setTraits([]);
+        setSelectedTrait(null);
+        processImageUpload(imageUrl);
+      };
+      reader.readAsDataURL(file);
+    }
+    // Reset the input value so the same file can be selected again
+    event.target.value = '';
   };
 
   const addMaskTrait = () => {
@@ -310,8 +331,15 @@ const MaskCustomizer = () => {
                   DOWNLOAD IMAGE
                 </Button>
                 
+                <input
+                  ref={changeImageInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleChangeImage}
+                  className="hidden"
+                />
                 <Button
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={() => changeImageInputRef.current?.click()}
                   variant="outline"
                   className="font-black border-4 border-black text-lg px-6 py-3"
                 >

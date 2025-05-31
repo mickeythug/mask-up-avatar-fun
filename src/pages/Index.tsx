@@ -4,6 +4,7 @@ import PFPDownloader from '../components/PFPDownloader';
 import ContractAddress from '../components/ContractAddress';
 import Socials from '../components/Socials';
 import MaskCustomizer from '../components/MaskCustomizer';
+import MaskTokenPrice from '../components/MaskTokenPrice';
 import { Button } from '../components/ui/button';
 
 const Index = () => {
@@ -29,6 +30,9 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-300 via-orange-400 to-orange-500 relative">
+      {/* MASK Token Price - Top Center */}
+      <MaskTokenPrice />
+      
       {/* Socials in top corner */}
       <Socials />
       

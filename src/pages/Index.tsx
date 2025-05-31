@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Upload, Copy } from 'lucide-react';
 
@@ -37,31 +36,6 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-orange-400 flex flex-col items-center justify-center p-4 relative">
       {/* Road Signs - Much Larger and More Visible */}
-      <div className="absolute top-20 left-20 transform -rotate-12 z-10">
-        <div 
-          className="bg-green-600 border-8 border-white p-8 shadow-2xl"
-          style={{ 
-            borderRadius: '16px',
-            clipPath: 'polygon(10% 0%, 90% 0%, 100% 25%, 90% 100%, 10% 100%, 0% 25%)',
-            width: '200px',
-            height: '160px'
-          }}
-        >
-          <div 
-            className="text-white font-black text-3xl text-center flex items-center justify-center h-full"
-            style={{ 
-              fontFamily: 'Impact, Arial Black, sans-serif',
-              textShadow: '3px 3px 0px rgba(0,0,0,0.8)',
-              letterSpacing: '2px'
-            }}
-          >
-            MASK ON
-            <br />
-            ZONE
-          </div>
-        </div>
-      </div>
-
       <div className="absolute top-20 right-20 transform rotate-6 z-10">
         <div 
           className="bg-yellow-400 border-8 border-black p-8 shadow-2xl"

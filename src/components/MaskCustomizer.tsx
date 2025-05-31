@@ -17,19 +17,29 @@ interface MaskTrait {
 
 const MaskCustomizer = () => {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
   const [traits, setTraits] = useState<MaskTrait[]>([]);
   const [selectedTrait, setSelectedTrait] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setUploadedImage(e.target?.result as string);
+        const imageUrl = e.target?.result as string;
+        setUploadedImage(imageUrl);
+        
+        // Get image dimensions
+        const img = new Image();
+        img.onload = () => {
+          setImageSize({ width: img.width, height: img.height });
+        };
+        img.src = imageUrl;
       };
       reader.readAsDataURL(file);
     }
@@ -67,7 +77,7 @@ const MaskCustomizer = () => {
     setSelectedTrait(traitId);
     setIsDragging(true);
     
-    const rect = canvasRef.current?.getBoundingClientRect();
+    const rect = imageRef.current?.getBoundingClientRect();
     if (rect) {
       const trait = traits.find(t => t.id === traitId);
       if (trait) {
@@ -80,13 +90,11 @@ const MaskCustomizer = () => {
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (isDragging && selectedTrait) {
-      const rect = canvasRef.current?.getBoundingClientRect();
-      if (rect) {
-        const newX = e.clientX - rect.left - dragOffset.x;
-        const newY = e.clientY - rect.top - dragOffset.y;
-        updateTrait(selectedTrait, { x: newX, y: newY });
-      }
+    if (isDragging && selectedTrait && imageRef.current) {
+      const rect = imageRef.current.getBoundingClientRect();
+      const newX = e.clientX - rect.left - dragOffset.x;
+      const newY = e.clientY - rect.top - dragOffset.y;
+      updateTrait(selectedTrait, { x: newX, y: newY });
     }
   };
 
@@ -95,44 +103,75 @@ const MaskCustomizer = () => {
   };
 
   const downloadImage = async () => {
-    if (!canvasRef.current || !uploadedImage) return;
+    if (!canvasRef.current || !uploadedImage || !imageRef.current) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Set canvas size to match the original image
+    canvas.width = imageSize.width;
+    canvas.height = imageSize.height;
+
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw background image
+    // Draw background image at full resolution
     const img = new Image();
     img.onload = () => {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
+      ctx.drawImage(img, 0, 0, imageSize.width, imageSize.height);
 
-      // Draw traits
+      // Calculate scale factor between displayed image and original image
+      const displayRect = imageRef.current!.getBoundingClientRect();
+      const scaleFactorX = imageSize.width / displayRect.width;
+      const scaleFactorY = imageSize.height / displayRect.height;
+
+      // Draw traits with proper scaling
+      let loadedTraits = 0;
+      const totalTraits = traits.length;
+
+      if (totalTraits === 0) {
+        // No traits, download immediately
+        setTimeout(() => {
+          const link = document.createElement('a');
+          link.download = 'masked-image.png';
+          link.href = canvas.toDataURL();
+          link.click();
+        }, 100);
+        return;
+      }
+
       traits.forEach(trait => {
         const maskImg = new Image();
         maskImg.onload = () => {
           ctx.save();
           ctx.globalAlpha = trait.opacity;
-          ctx.translate(trait.x + (maskImg.width * trait.scale) / 2, trait.y + (maskImg.height * trait.scale) / 2);
+          
+          // Scale positions and size to match original image dimensions
+          const scaledX = trait.x * scaleFactorX;
+          const scaledY = trait.y * scaleFactorY;
+          const scaledWidth = maskImg.width * trait.scale * scaleFactorX;
+          const scaledHeight = maskImg.height * trait.scale * scaleFactorY;
+          
+          ctx.translate(scaledX + scaledWidth / 2, scaledY + scaledHeight / 2);
           ctx.rotate((trait.rotation * Math.PI) / 180);
-          ctx.scale(trait.scale, trait.scale);
+          ctx.scale(trait.scale * scaleFactorX, trait.scale * scaleFactorY);
           ctx.drawImage(maskImg, -maskImg.width / 2, -maskImg.height / 2);
           ctx.restore();
+
+          loadedTraits++;
+          if (loadedTraits === totalTraits) {
+            // All traits loaded, download
+            setTimeout(() => {
+              const link = document.createElement('a');
+              link.download = 'masked-image.png';
+              link.href = canvas.toDataURL();
+              link.click();
+            }, 100);
+          }
         };
         maskImg.src = trait.src;
       });
-
-      // Download
-      setTimeout(() => {
-        const link = document.createElement('a');
-        link.download = 'masked-image.png';
-        link.href = canvas.toDataURL();
-        link.click();
-      }, 100);
     };
     img.src = uploadedImage;
   };
@@ -140,15 +179,15 @@ const MaskCustomizer = () => {
   const selectedTraitData = traits.find(t => t.id === selectedTrait);
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-4">
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Canvas Area */}
-        <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg border-4 border-black shadow-lg p-4">
-            <h3 className="text-2xl font-black mb-4 font-comic">CUSTOMIZE YOUR MASK</h3>
+    <div className="w-full max-w-7xl mx-auto p-4">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        {/* Canvas Area - Takes up 3 columns */}
+        <div className="lg:col-span-3">
+          <div className="bg-white rounded-lg border-4 border-black shadow-lg p-6">
+            <h3 className="text-3xl font-black mb-6 font-kalam">CUSTOMIZE YOUR MASK</h3>
             
             {!uploadedImage ? (
-              <div className="border-4 border-dashed border-gray-300 rounded-lg p-8 text-center">
+              <div className="border-4 border-dashed border-gray-300 rounded-lg p-12 text-center min-h-[600px] flex flex-col items-center justify-center">
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -158,26 +197,29 @@ const MaskCustomizer = () => {
                 />
                 <Button
                   onClick={() => fileInputRef.current?.click()}
-                  className="bg-orange-500 hover:bg-orange-600 text-white font-black border-4 border-black"
+                  className="bg-orange-500 hover:bg-orange-600 text-white font-black border-4 border-black text-xl px-8 py-4"
                   size="lg"
                 >
-                  <Upload className="mr-2" />
+                  <Upload className="mr-2 w-6 h-6" />
                   UPLOAD YOUR IMAGE
                 </Button>
-                <p className="mt-4 text-gray-600 font-comic">Upload a photo to start adding masks!</p>
+                <p className="mt-6 text-gray-600 font-kalam text-lg">Upload a photo to start adding masks!</p>
               </div>
             ) : (
-              <div className="relative border-4 border-black rounded-lg overflow-hidden bg-gray-100">
+              <div className="border-4 border-black rounded-lg overflow-hidden bg-gray-100 min-h-[600px]">
                 <div
-                  className="relative inline-block cursor-move"
+                  className="relative w-full h-full flex items-center justify-center"
                   onMouseMove={handleMouseMove}
                   onMouseUp={handleMouseUp}
                   onMouseLeave={handleMouseUp}
+                  style={{ minHeight: '600px' }}
                 >
                   <img
+                    ref={imageRef}
                     src={uploadedImage}
                     alt="Uploaded"
-                    className="max-w-full max-h-96 object-contain"
+                    className="max-w-full max-h-[600px] object-contain"
+                    style={{ width: 'auto', height: 'auto' }}
                   />
                   
                   {/* Render traits */}
@@ -186,7 +228,7 @@ const MaskCustomizer = () => {
                       key={trait.id}
                       src={trait.src}
                       alt="Mask trait"
-                      className={`absolute cursor-grab active:cursor-grabbing ${
+                      className={`absolute cursor-grab active:cursor-grabbing pointer-events-auto ${
                         selectedTrait === trait.id ? 'ring-4 ring-yellow-400' : ''
                       }`}
                       style={{
@@ -195,6 +237,7 @@ const MaskCustomizer = () => {
                         transform: `scale(${trait.scale}) rotate(${trait.rotation}deg)`,
                         opacity: trait.opacity,
                         transformOrigin: 'center',
+                        zIndex: 10,
                       }}
                       onMouseDown={(e) => handleMouseDown(e, trait.id)}
                       draggable={false}
@@ -207,18 +250,18 @@ const MaskCustomizer = () => {
             )}
 
             {uploadedImage && (
-              <div className="flex gap-2 mt-4">
+              <div className="flex gap-3 mt-6">
                 <Button
                   onClick={addMaskTrait}
-                  className="bg-green-500 hover:bg-green-600 text-white font-black border-4 border-black"
+                  className="bg-green-500 hover:bg-green-600 text-white font-black border-4 border-black text-lg px-6 py-3"
                 >
-                  <Plus className="mr-2" />
+                  <Plus className="mr-2 w-5 h-5" />
                   ADD MASK
                 </Button>
                 
                 <Button
                   onClick={downloadImage}
-                  className="bg-blue-500 hover:bg-blue-600 text-white font-black border-4 border-black"
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-black border-4 border-black text-lg px-6 py-3"
                 >
                   DOWNLOAD IMAGE
                 </Button>
@@ -226,7 +269,7 @@ const MaskCustomizer = () => {
                 <Button
                   onClick={() => fileInputRef.current?.click()}
                   variant="outline"
-                  className="font-black border-4 border-black"
+                  className="font-black border-4 border-black text-lg px-6 py-3"
                 >
                   CHANGE IMAGE
                 </Button>
@@ -235,10 +278,10 @@ const MaskCustomizer = () => {
           </div>
         </div>
 
-        {/* Controls Panel */}
+        {/* Controls Panel - Takes up 1 column */}
         <div className="space-y-4">
           <div className="bg-yellow-300 rounded-lg border-4 border-black p-4">
-            <h4 className="text-xl font-black mb-4 font-comic">MASK CONTROLS</h4>
+            <h4 className="text-xl font-black mb-4 font-kalam">MASK CONTROLS</h4>
             
             {selectedTraitData ? (
               <div className="space-y-4">
@@ -287,7 +330,7 @@ const MaskCustomizer = () => {
                     value={[selectedTraitData.x]}
                     onValueChange={([value]) => updateTrait(selectedTrait!, { x: value })}
                     min={-100}
-                    max={500}
+                    max={800}
                     step={1}
                     className="mt-2"
                   />
@@ -300,7 +343,7 @@ const MaskCustomizer = () => {
                     value={[selectedTraitData.y]}
                     onValueChange={([value]) => updateTrait(selectedTrait!, { y: value })}
                     min={-100}
-                    max={500}
+                    max={600}
                     step={1}
                     className="mt-2"
                   />
@@ -317,7 +360,7 @@ const MaskCustomizer = () => {
                 </Button>
               </div>
             ) : (
-              <p className="text-center text-gray-600 font-comic">
+              <p className="text-center text-gray-600 font-kalam">
                 {traits.length === 0 
                   ? "Add a mask to start customizing!" 
                   : "Click on a mask to edit it!"
@@ -329,7 +372,7 @@ const MaskCustomizer = () => {
           {/* Trait List */}
           {traits.length > 0 && (
             <div className="bg-pink-300 rounded-lg border-4 border-black p-4">
-              <h4 className="text-lg font-black mb-2 font-comic">MASKS</h4>
+              <h4 className="text-lg font-black mb-2 font-kalam">MASKS</h4>
               <div className="space-y-2">
                 {traits.map((trait, index) => (
                   <div

@@ -35,22 +35,24 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-orange-400 flex flex-col items-center justify-center p-4">
-      {/* Road Signs */}
-      <div className="absolute top-10 left-10 transform -rotate-12">
+    <div className="min-h-screen bg-orange-400 flex flex-col items-center justify-center p-4 relative">
+      {/* Road Signs - Much Larger and More Visible */}
+      <div className="absolute top-20 left-20 transform -rotate-12 z-10">
         <div 
-          className="bg-green-600 border-4 border-white p-4 shadow-lg"
+          className="bg-green-600 border-8 border-white p-8 shadow-2xl"
           style={{ 
-            borderRadius: '8px',
-            clipPath: 'polygon(10% 0%, 90% 0%, 100% 25%, 90% 100%, 10% 100%, 0% 25%)'
+            borderRadius: '16px',
+            clipPath: 'polygon(10% 0%, 90% 0%, 100% 25%, 90% 100%, 10% 100%, 0% 25%)',
+            width: '200px',
+            height: '160px'
           }}
         >
           <div 
-            className="text-white font-black text-lg text-center"
+            className="text-white font-black text-3xl text-center flex items-center justify-center h-full"
             style={{ 
               fontFamily: 'Impact, Arial Black, sans-serif',
-              textShadow: '2px 2px 0px rgba(0,0,0,0.8)',
-              letterSpacing: '1px'
+              textShadow: '3px 3px 0px rgba(0,0,0,0.8)',
+              letterSpacing: '2px'
             }}
           >
             MASK ON
@@ -60,16 +62,20 @@ const Index = () => {
         </div>
       </div>
 
-      <div className="absolute top-20 right-10 transform rotate-6">
+      <div className="absolute top-20 right-20 transform rotate-6 z-10">
         <div 
-          className="bg-yellow-400 border-4 border-black p-3 shadow-lg"
-          style={{ borderRadius: '8px' }}
+          className="bg-yellow-400 border-8 border-black p-8 shadow-2xl"
+          style={{ 
+            borderRadius: '16px',
+            width: '200px',
+            height: '140px'
+          }}
         >
           <div 
-            className="text-black font-black text-base text-center"
+            className="text-black font-black text-2xl text-center flex items-center justify-center h-full"
             style={{ 
               fontFamily: 'Impact, Arial Black, sans-serif',
-              letterSpacing: '1px'
+              letterSpacing: '2px'
             }}
           >
             ARMY OF
@@ -79,17 +85,21 @@ const Index = () => {
         </div>
       </div>
 
-      <div className="absolute bottom-20 left-16 transform -rotate-6">
+      <div className="absolute bottom-40 left-20 transform -rotate-6 z-10">
         <div 
-          className="bg-red-600 border-4 border-white p-3 shadow-lg"
-          style={{ borderRadius: '8px' }}
+          className="bg-red-600 border-8 border-white p-8 shadow-2xl"
+          style={{ 
+            borderRadius: '16px',
+            width: '180px',
+            height: '140px'
+          }}
         >
           <div 
-            className="text-white font-black text-sm text-center"
+            className="text-white font-black text-2xl text-center flex items-center justify-center h-full"
             style={{ 
               fontFamily: 'Impact, Arial Black, sans-serif',
-              textShadow: '2px 2px 0px rgba(0,0,0,0.8)',
-              letterSpacing: '1px'
+              textShadow: '3px 3px 0px rgba(0,0,0,0.8)',
+              letterSpacing: '2px'
             }}
           >
             NO MASK
@@ -99,17 +109,21 @@ const Index = () => {
         </div>
       </div>
 
-      <div className="absolute bottom-32 right-20 transform rotate-12">
+      <div className="absolute bottom-40 right-20 transform rotate-12 z-10">
         <div 
-          className="bg-blue-600 border-4 border-white p-3 shadow-lg"
-          style={{ borderRadius: '8px' }}
+          className="bg-blue-600 border-8 border-white p-8 shadow-2xl"
+          style={{ 
+            borderRadius: '16px',
+            width: '170px',
+            height: '130px'
+          }}
         >
           <div 
-            className="text-white font-black text-sm text-center"
+            className="text-white font-black text-2xl text-center flex items-center justify-center h-full"
             style={{ 
               fontFamily: 'Impact, Arial Black, sans-serif',
-              textShadow: '2px 2px 0px rgba(0,0,0,0.8)',
-              letterSpacing: '1px'
+              textShadow: '3px 3px 0px rgba(0,0,0,0.8)',
+              letterSpacing: '2px'
             }}
           >
             PONKE
@@ -120,7 +134,7 @@ const Index = () => {
       </div>
 
       {/* Main Title */}
-      <div className="mb-8 text-center">
+      <div className="mb-8 text-center z-20 relative">
         <h1 
           className="text-4xl md:text-6xl font-black text-black mb-2 transform -rotate-1"
           style={{ 
@@ -134,7 +148,7 @@ const Index = () => {
       </div>
 
       {/* Image Upload Area */}
-      <div className="relative mb-6">
+      <div className="relative mb-6 z-20">
         <div 
           className="w-80 h-80 bg-orange-200 border-4 border-black transform rotate-1 relative overflow-hidden"
           style={{ borderRadius: '8px' }}
@@ -197,8 +211,8 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Token Address Section - MOVED BELOW IMAGE */}
-      <div className="mb-6 w-full max-w-lg">
+      {/* Token Address Section */}
+      <div className="mb-6 w-full max-w-lg z-20 relative">
         <div 
           className="bg-orange-500 border-4 border-black p-4 transform -rotate-1 shadow-lg"
           style={{ borderRadius: '12px' }}
@@ -245,7 +259,7 @@ const Index = () => {
       {/* Add Image Button */}
       <button
         onClick={handleAddImageClick}
-        className="bg-red-500 hover:bg-red-600 text-white font-black py-4 px-8 border-4 border-black transform -rotate-1 hover:rotate-0 transition-transform duration-200 shadow-lg"
+        className="bg-red-500 hover:bg-red-600 text-white font-black py-4 px-8 border-4 border-black transform -rotate-1 hover:rotate-0 transition-transform duration-200 shadow-lg z-20 relative"
         style={{ 
           fontFamily: 'Comic Sans MS, cursive',
           fontSize: '18px',

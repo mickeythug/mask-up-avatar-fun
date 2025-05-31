@@ -205,7 +205,7 @@ const MaskCustomizer = () => {
                 <p className="mt-6 text-gray-600 font-kalam text-lg">Upload a photo to start adding masks!</p>
               </div>
             ) : (
-              <div className="border-4 border-black rounded-lg overflow-hidden bg-gray-100 h-[700px]">
+              <div className="border-4 border-black rounded-lg overflow-hidden bg-black h-[700px]">
                 <div
                   className="relative w-full h-full flex items-center justify-center"
                   onMouseMove={handleMouseMove}
@@ -216,7 +216,7 @@ const MaskCustomizer = () => {
                     ref={imageRef}
                     src={uploadedImage}
                     alt="Uploaded"
-                    className="w-full h-full object-cover"
+                    className="max-w-full max-h-full object-contain"
                   />
                   
                   {/* Render traits */}

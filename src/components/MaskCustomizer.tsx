@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Slider } from './ui/slider';
@@ -17,6 +18,7 @@ interface MaskTrait {
 const MaskCustomizer = () => {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
+  const [displaySize, setDisplaySize] = useState({ width: 0, height: 0 });
   const [traits, setTraits] = useState<MaskTrait[]>([]);
   const [selectedTrait, setSelectedTrait] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -24,6 +26,7 @@ const MaskCustomizer = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -33,10 +36,45 @@ const MaskCustomizer = () => {
         const imageUrl = e.target?.result as string;
         setUploadedImage(imageUrl);
         
-        // Get image dimensions
+        // Get image dimensions and calculate display size
         const img = new Image();
         img.onload = () => {
           setImageSize({ width: img.width, height: img.height });
+          
+          // Calculate display dimensions that fit well in the container
+          const maxWidth = 800;
+          const maxHeight = 600;
+          const aspectRatio = img.width / img.height;
+          
+          let displayWidth = img.width;
+          let displayHeight = img.height;
+          
+          // Scale down if image is too large
+          if (displayWidth > maxWidth || displayHeight > maxHeight) {
+            if (aspectRatio > 1) {
+              // Landscape
+              displayWidth = Math.min(maxWidth, displayWidth);
+              displayHeight = displayWidth / aspectRatio;
+            } else {
+              // Portrait
+              displayHeight = Math.min(maxHeight, displayHeight);
+              displayWidth = displayHeight * aspectRatio;
+            }
+          }
+          
+          // Ensure minimum size for usability
+          const minSize = 400;
+          if (displayWidth < minSize && displayHeight < minSize) {
+            if (aspectRatio > 1) {
+              displayWidth = minSize;
+              displayHeight = minSize / aspectRatio;
+            } else {
+              displayHeight = minSize;
+              displayWidth = minSize * aspectRatio;
+            }
+          }
+          
+          setDisplaySize({ width: displayWidth, height: displayHeight });
         };
         img.src = imageUrl;
       };
@@ -76,7 +114,7 @@ const MaskCustomizer = () => {
     setSelectedTrait(traitId);
     setIsDragging(true);
     
-    const rect = imageRef.current?.getBoundingClientRect();
+    const rect = containerRef.current?.getBoundingClientRect();
     if (rect) {
       const trait = traits.find(t => t.id === traitId);
       if (trait) {
@@ -89,8 +127,8 @@ const MaskCustomizer = () => {
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (isDragging && selectedTrait && imageRef.current) {
-      const rect = imageRef.current.getBoundingClientRect();
+    if (isDragging && selectedTrait && containerRef.current) {
+      const rect = containerRef.current.getBoundingClientRect();
       const newX = e.clientX - rect.left - dragOffset.x;
       const newY = e.clientY - rect.top - dragOffset.y;
       updateTrait(selectedTrait, { x: newX, y: newY });
@@ -186,7 +224,7 @@ const MaskCustomizer = () => {
             <h3 className="text-3xl font-black mb-6 font-kalam">CUSTOMIZE YOUR MASK</h3>
             
             {!uploadedImage ? (
-              <div className="border-4 border-dashed border-gray-300 rounded-lg p-12 text-center h-[700px] flex flex-col items-center justify-center">
+              <div className="border-4 border-dashed border-gray-300 rounded-lg p-12 text-center h-[600px] flex flex-col items-center justify-center">
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -205,9 +243,14 @@ const MaskCustomizer = () => {
                 <p className="mt-6 text-gray-600 font-kalam text-lg">Upload a photo to start adding masks!</p>
               </div>
             ) : (
-              <div className="border-4 border-black rounded-lg overflow-hidden bg-black h-[700px]">
+              <div className="border-4 border-black rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center p-4">
                 <div
-                  className="relative w-full h-full flex items-center justify-center"
+                  ref={containerRef}
+                  className="relative bg-white"
+                  style={{
+                    width: displaySize.width,
+                    height: displaySize.height,
+                  }}
                   onMouseMove={handleMouseMove}
                   onMouseUp={handleMouseUp}
                   onMouseLeave={handleMouseUp}
@@ -216,7 +259,11 @@ const MaskCustomizer = () => {
                     ref={imageRef}
                     src={uploadedImage}
                     alt="Uploaded"
-                    className="max-w-full max-h-full object-contain"
+                    className="w-full h-full object-cover"
+                    style={{
+                      width: displaySize.width,
+                      height: displaySize.height,
+                    }}
                   />
                   
                   {/* Render traits */}

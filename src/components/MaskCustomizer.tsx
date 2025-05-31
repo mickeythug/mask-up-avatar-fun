@@ -1,10 +1,10 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Slider } from './ui/slider';
 import { Label } from './ui/label';
-import { Upload, Move, Plus, Minus, Smartphone, Tablet, Monitor } from 'lucide-react';
+import { Upload, Move, Plus, Minus, Smartphone, Tablet, Monitor, Save, Download } from 'lucide-react';
 import { useResponsiveDesign } from '../hooks/useResponsiveDesign';
+import { toast } from 'sonner';
 
 interface MaskTrait {
   id: string;
@@ -24,6 +24,8 @@ const MaskCustomizer = () => {
   const [selectedTrait, setSelectedTrait] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
+  const [savedImageUrl, setSavedImageUrl] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const changeImageInputRef = useRef<HTMLInputElement>(null);
@@ -39,14 +41,14 @@ const MaskCustomizer = () => {
     let maxWidth, maxHeight;
     
     if (isMobile) {
-      maxWidth = Math.min(screenWidth - 32, 400); // 16px padding on each side
-      maxHeight = Math.min(screenHeight * 0.5, 400);
-    } else if (isTablet) {
-      maxWidth = Math.min(screenWidth * 0.6, 600);
+      maxWidth = Math.min(screenWidth - 32, 500); // 16px padding on each side
       maxHeight = Math.min(screenHeight * 0.6, 500);
-    } else {
-      maxWidth = Math.min(screenWidth * 0.7, 1000);
+    } else if (isTablet) {
+      maxWidth = Math.min(screenWidth * 0.7, 800);
       maxHeight = Math.min(screenHeight * 0.7, 700);
+    } else {
+      maxWidth = Math.min(screenWidth * 0.8, 1200);
+      maxHeight = Math.min(screenHeight * 0.8, 900);
     }
 
     return { maxWidth, maxHeight };
@@ -54,6 +56,7 @@ const MaskCustomizer = () => {
 
   const processImageUpload = (imageUrl: string) => {
     setUploadedImage(imageUrl);
+    setSavedImageUrl(null); // Clear any saved image when uploading new
     
     const img = new Image();
     img.onload = () => {
@@ -77,7 +80,7 @@ const MaskCustomizer = () => {
       }
       
       // Ensure minimum usable size
-      const minSize = screenSize.isMobile ? 280 : 350;
+      const minSize = screenSize.isMobile ? 400 : 600;
       if (displayWidth < minSize && displayHeight < minSize) {
         if (aspectRatio > 1) {
           displayWidth = minSize;
@@ -112,7 +115,7 @@ const MaskCustomizer = () => {
         }
       }
       
-      const minSize = screenSize.isMobile ? 280 : 350;
+      const minSize = screenSize.isMobile ? 400 : 600;
       if (displayWidth < minSize && displayHeight < minSize) {
         if (aspectRatio > 1) {
           displayWidth = minSize;
@@ -147,6 +150,7 @@ const MaskCustomizer = () => {
         const imageUrl = e.target?.result as string;
         setTraits([]);
         setSelectedTrait(null);
+        setSavedImageUrl(null);
         processImageUpload(imageUrl);
       };
       reader.readAsDataURL(file);
@@ -166,12 +170,14 @@ const MaskCustomizer = () => {
     };
     setTraits([...traits, newTrait]);
     setSelectedTrait(newTrait.id);
+    setSavedImageUrl(null); // Clear saved image when adding new trait
   };
 
   const updateTrait = (id: string, updates: Partial<MaskTrait>) => {
     setTraits(traits.map(trait => 
       trait.id === id ? { ...trait, ...updates } : trait
     ));
+    setSavedImageUrl(null); // Clear saved image when updating traits
   };
 
   const removeTrait = (id: string) => {
@@ -179,6 +185,7 @@ const MaskCustomizer = () => {
     if (selectedTrait === id) {
       setSelectedTrait(null);
     }
+    setSavedImageUrl(null); // Clear saved image when removing trait
   };
 
   const handleMouseDown = (e: React.MouseEvent, traitId: string) => {
@@ -237,70 +244,91 @@ const MaskCustomizer = () => {
     setIsDragging(false);
   };
 
-  const downloadImage = async () => {
-    if (!canvasRef.current || !uploadedImage || !imageRef.current) return;
+  const saveImage = async () => {
+    if (!canvasRef.current || !uploadedImage || !imageRef.current) {
+      toast.error("No image to save");
+      return;
+    }
 
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    setIsSaving(true);
+    
+    try {
+      const canvas = canvasRef.current;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
 
-    canvas.width = imageSize.width;
-    canvas.height = imageSize.height;
+      // Set canvas size to match the display size for accurate rendering
+      canvas.width = displaySize.width;
+      canvas.height = displaySize.height;
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const img = new Image();
-    img.onload = () => {
-      ctx.drawImage(img, 0, 0, imageSize.width, imageSize.height);
+      const img = new Image();
+      img.onload = () => {
+        // Draw the base image to fill the canvas
+        ctx.drawImage(img, 0, 0, displaySize.width, displaySize.height);
 
-      const displayRect = imageRef.current!.getBoundingClientRect();
-      const scaleFactorX = imageSize.width / displayRect.width;
-      const scaleFactorY = imageSize.height / displayRect.height;
+        let loadedTraits = 0;
+        const totalTraits = traits.length;
 
-      let loadedTraits = 0;
-      const totalTraits = traits.length;
+        if (totalTraits === 0) {
+          // No traits, just save the base image
+          const imageUrl = canvas.toDataURL('image/png');
+          setSavedImageUrl(imageUrl);
+          setIsSaving(false);
+          toast.success("Image saved! You can now download it.");
+          return;
+        }
 
-      if (totalTraits === 0) {
-        setTimeout(() => {
-          const link = document.createElement('a');
-          link.download = 'masked-image.png';
-          link.href = canvas.toDataURL();
-          link.click();
-        }, 100);
-        return;
-      }
+        // Load and draw each trait
+        traits.forEach(trait => {
+          const maskImg = new Image();
+          maskImg.crossOrigin = "anonymous";
+          maskImg.onload = () => {
+            ctx.save();
+            ctx.globalAlpha = trait.opacity;
+            
+            // Use the exact positioning and scaling as displayed
+            const centerX = trait.x + (maskImg.width * trait.scale) / 2;
+            const centerY = trait.y + (maskImg.height * trait.scale) / 2;
+            
+            ctx.translate(centerX, centerY);
+            ctx.rotate((trait.rotation * Math.PI) / 180);
+            ctx.scale(trait.scale, trait.scale);
+            ctx.drawImage(maskImg, -maskImg.width / 2, -maskImg.height / 2);
+            ctx.restore();
 
-      traits.forEach(trait => {
-        const maskImg = new Image();
-        maskImg.onload = () => {
-          ctx.save();
-          ctx.globalAlpha = trait.opacity;
-          
-          const scaledX = trait.x * scaleFactorX;
-          const scaledY = trait.y * scaleFactorY;
-          const scaledWidth = maskImg.width * trait.scale * scaleFactorX;
-          const scaledHeight = maskImg.height * trait.scale * scaleFactorY;
-          
-          ctx.translate(scaledX + scaledWidth / 2, scaledY + scaledHeight / 2);
-          ctx.rotate((trait.rotation * Math.PI) / 180);
-          ctx.scale(trait.scale * scaleFactorX, trait.scale * scaleFactorY);
-          ctx.drawImage(maskImg, -maskImg.width / 2, -maskImg.height / 2);
-          ctx.restore();
+            loadedTraits++;
+            if (loadedTraits === totalTraits) {
+              const imageUrl = canvas.toDataURL('image/png');
+              setSavedImageUrl(imageUrl);
+              setIsSaving(false);
+              toast.success("Image saved! You can now download it.");
+            }
+          };
+          maskImg.src = trait.src;
+        });
+      };
+      img.crossOrigin = "anonymous";
+      img.src = uploadedImage;
+    } catch (error) {
+      console.error('Error saving image:', error);
+      setIsSaving(false);
+      toast.error("Failed to save image");
+    }
+  };
 
-          loadedTraits++;
-          if (loadedTraits === totalTraits) {
-            setTimeout(() => {
-              const link = document.createElement('a');
-              link.download = 'masked-image.png';
-              link.href = canvas.toDataURL();
-              link.click();
-            }, 100);
-          }
-        };
-        maskImg.src = trait.src;
-      });
-    };
-    img.src = uploadedImage;
+  const downloadImage = () => {
+    if (!savedImageUrl) {
+      toast.error("Please save the image first");
+      return;
+    }
+    
+    const link = document.createElement('a');
+    link.download = 'masked-image.png';
+    link.href = savedImageUrl;
+    link.click();
+    toast.success("Image downloaded!");
   };
 
   const selectedTraitData = traits.find(t => t.id === selectedTrait);
@@ -422,10 +450,21 @@ const MaskCustomizer = () => {
                 </Button>
                 
                 <Button
-                  onClick={downloadImage}
-                  className="bg-blue-500 hover:bg-blue-600 text-white font-black border-4 border-black text-sm sm:text-lg px-4 sm:px-6 py-2 sm:py-3 flex-1 sm:flex-none"
+                  onClick={saveImage}
+                  disabled={isSaving}
+                  className="bg-purple-500 hover:bg-purple-600 text-white font-black border-4 border-black text-sm sm:text-lg px-4 sm:px-6 py-2 sm:py-3 flex-1 sm:flex-none disabled:opacity-50"
                 >
-                  DOWNLOAD IMAGE
+                  <Save className="mr-2 w-4 h-4 sm:w-5 sm:h-5" />
+                  {isSaving ? 'SAVING...' : 'SAVE IMAGE'}
+                </Button>
+                
+                <Button
+                  onClick={downloadImage}
+                  disabled={!savedImageUrl}
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-black border-4 border-black text-sm sm:text-lg px-4 sm:px-6 py-2 sm:py-3 flex-1 sm:flex-none disabled:opacity-50"
+                >
+                  <Download className="mr-2 w-4 h-4 sm:w-5 sm:h-5" />
+                  DOWNLOAD
                 </Button>
                 
                 <input
@@ -561,6 +600,15 @@ const MaskCustomizer = () => {
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Status Info */}
+          {savedImageUrl && (
+            <div className="bg-green-100 rounded-lg border-4 border-green-500 p-3">
+              <p className="text-green-800 font-black text-sm text-center">
+                ✓ IMAGE SAVED! Ready to download
+              </p>
             </div>
           )}
         </div>

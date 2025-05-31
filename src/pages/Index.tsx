@@ -2,7 +2,6 @@
 import React from 'react';
 import PFPDownloader from '../components/PFPDownloader';
 import ContractAddress from '../components/ContractAddress';
-import Socials from '../components/Socials';
 
 const Index = () => {
   return (
@@ -39,9 +38,6 @@ const Index = () => {
           </div>
         </div>
       </div>
-      
-      {/* Socials Section */}
-      <Socials />
       
       {/* Contract Address at bottom */}
       <ContractAddress />

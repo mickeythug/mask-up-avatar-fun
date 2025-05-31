@@ -1,8 +1,10 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Slider } from './ui/slider';
 import { Label } from './ui/label';
-import { Upload, Move, Plus, Minus } from 'lucide-react';
+import { Upload, Move, Plus, Minus, Smartphone, Tablet, Monitor } from 'lucide-react';
+import { useResponsiveDesign } from '../hooks/useResponsiveDesign';
 
 interface MaskTrait {
   id: string;
@@ -27,38 +29,55 @@ const MaskCustomizer = () => {
   const changeImageInputRef = useRef<HTMLInputElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  
+  const screenSize = useResponsiveDesign();
+
+  const getOptimalImageSize = () => {
+    const { width: screenWidth, height: screenHeight, isMobile, isTablet } = screenSize;
+    
+    // Responsive container sizes
+    let maxWidth, maxHeight;
+    
+    if (isMobile) {
+      maxWidth = Math.min(screenWidth - 32, 400); // 16px padding on each side
+      maxHeight = Math.min(screenHeight * 0.5, 400);
+    } else if (isTablet) {
+      maxWidth = Math.min(screenWidth * 0.6, 600);
+      maxHeight = Math.min(screenHeight * 0.6, 500);
+    } else {
+      maxWidth = Math.min(screenWidth * 0.7, 1000);
+      maxHeight = Math.min(screenHeight * 0.7, 700);
+    }
+
+    return { maxWidth, maxHeight };
+  };
 
   const processImageUpload = (imageUrl: string) => {
     setUploadedImage(imageUrl);
     
-    // Get image dimensions and calculate display size
     const img = new Image();
     img.onload = () => {
       setImageSize({ width: img.width, height: img.height });
       
-      // Calculate display dimensions that fit well in the container
-      const maxWidth = 800;
-      const maxHeight = 600;
+      const { maxWidth, maxHeight } = getOptimalImageSize();
       const aspectRatio = img.width / img.height;
       
       let displayWidth = img.width;
       let displayHeight = img.height;
       
-      // Scale down if image is too large
+      // Scale to fit container while maintaining aspect ratio
       if (displayWidth > maxWidth || displayHeight > maxHeight) {
         if (aspectRatio > 1) {
-          // Landscape
           displayWidth = Math.min(maxWidth, displayWidth);
           displayHeight = displayWidth / aspectRatio;
         } else {
-          // Portrait
           displayHeight = Math.min(maxHeight, displayHeight);
           displayWidth = displayHeight * aspectRatio;
         }
       }
       
-      // Ensure minimum size for usability
-      const minSize = 400;
+      // Ensure minimum usable size
+      const minSize = screenSize.isMobile ? 280 : 350;
       if (displayWidth < minSize && displayHeight < minSize) {
         if (aspectRatio > 1) {
           displayWidth = minSize;
@@ -73,6 +92,40 @@ const MaskCustomizer = () => {
     };
     img.src = imageUrl;
   };
+
+  // Re-calculate display size when screen size changes
+  useEffect(() => {
+    if (uploadedImage && imageSize.width > 0) {
+      const { maxWidth, maxHeight } = getOptimalImageSize();
+      const aspectRatio = imageSize.width / imageSize.height;
+      
+      let displayWidth = imageSize.width;
+      let displayHeight = imageSize.height;
+      
+      if (displayWidth > maxWidth || displayHeight > maxHeight) {
+        if (aspectRatio > 1) {
+          displayWidth = Math.min(maxWidth, displayWidth);
+          displayHeight = displayWidth / aspectRatio;
+        } else {
+          displayHeight = Math.min(maxHeight, displayHeight);
+          displayWidth = displayHeight * aspectRatio;
+        }
+      }
+      
+      const minSize = screenSize.isMobile ? 280 : 350;
+      if (displayWidth < minSize && displayHeight < minSize) {
+        if (aspectRatio > 1) {
+          displayWidth = minSize;
+          displayHeight = minSize / aspectRatio;
+        } else {
+          displayHeight = minSize;
+          displayWidth = minSize * aspectRatio;
+        }
+      }
+      
+      setDisplaySize({ width: displayWidth, height: displayHeight });
+    }
+  }, [screenSize, imageSize, uploadedImage]);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -92,14 +145,12 @@ const MaskCustomizer = () => {
       const reader = new FileReader();
       reader.onload = (e) => {
         const imageUrl = e.target?.result as string;
-        // Clear existing traits when changing image
         setTraits([]);
         setSelectedTrait(null);
         processImageUpload(imageUrl);
       };
       reader.readAsDataURL(file);
     }
-    // Reset the input value so the same file can be selected again
     event.target.value = '';
   };
 
@@ -107,9 +158,9 @@ const MaskCustomizer = () => {
     const newTrait: MaskTrait = {
       id: Date.now().toString(),
       src: '/lovable-uploads/5e4d24b3-7970-4376-943c-32b47f0c38b3.png',
-      x: 50,
-      y: 50,
-      scale: 1,
+      x: displaySize.width / 2 - 50,
+      y: displaySize.height / 2 - 50,
+      scale: screenSize.isMobile ? 0.8 : 1,
       rotation: 0,
       opacity: 1,
     };
@@ -147,11 +198,37 @@ const MaskCustomizer = () => {
     }
   };
 
+  const handleTouchStart = (e: React.TouchEvent, traitId: string) => {
+    e.preventDefault();
+    setSelectedTrait(traitId);
+    setIsDragging(true);
+    
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (rect && e.touches[0]) {
+      const trait = traits.find(t => t.id === traitId);
+      if (trait) {
+        setDragOffset({
+          x: e.touches[0].clientX - rect.left - trait.x,
+          y: e.touches[0].clientY - rect.top - trait.y
+        });
+      }
+    }
+  };
+
   const handleMouseMove = (e: React.MouseEvent) => {
     if (isDragging && selectedTrait && containerRef.current) {
       const rect = containerRef.current.getBoundingClientRect();
       const newX = e.clientX - rect.left - dragOffset.x;
       const newY = e.clientY - rect.top - dragOffset.y;
+      updateTrait(selectedTrait, { x: newX, y: newY });
+    }
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (isDragging && selectedTrait && containerRef.current && e.touches[0]) {
+      const rect = containerRef.current.getBoundingClientRect();
+      const newX = e.touches[0].clientX - rect.left - dragOffset.x;
+      const newY = e.touches[0].clientY - rect.top - dragOffset.y;
       updateTrait(selectedTrait, { x: newX, y: newY });
     }
   };
@@ -167,29 +244,23 @@ const MaskCustomizer = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Set canvas size to match the original image
     canvas.width = imageSize.width;
     canvas.height = imageSize.height;
 
-    // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw background image at full resolution
     const img = new Image();
     img.onload = () => {
       ctx.drawImage(img, 0, 0, imageSize.width, imageSize.height);
 
-      // Calculate scale factor between displayed image and original image
       const displayRect = imageRef.current!.getBoundingClientRect();
       const scaleFactorX = imageSize.width / displayRect.width;
       const scaleFactorY = imageSize.height / displayRect.height;
 
-      // Draw traits with proper scaling
       let loadedTraits = 0;
       const totalTraits = traits.length;
 
       if (totalTraits === 0) {
-        // No traits, download immediately
         setTimeout(() => {
           const link = document.createElement('a');
           link.download = 'masked-image.png';
@@ -205,7 +276,6 @@ const MaskCustomizer = () => {
           ctx.save();
           ctx.globalAlpha = trait.opacity;
           
-          // Scale positions and size to match original image dimensions
           const scaledX = trait.x * scaleFactorX;
           const scaledY = trait.y * scaleFactorY;
           const scaledWidth = maskImg.width * trait.scale * scaleFactorX;
@@ -219,7 +289,6 @@ const MaskCustomizer = () => {
 
           loadedTraits++;
           if (loadedTraits === totalTraits) {
-            // All traits loaded, download
             setTimeout(() => {
               const link = document.createElement('a');
               link.download = 'masked-image.png';
@@ -236,16 +305,37 @@ const MaskCustomizer = () => {
 
   const selectedTraitData = traits.find(t => t.id === selectedTrait);
 
+  const DeviceIndicator = () => {
+    const { isMobile, isTablet, isDesktop } = screenSize;
+    return (
+      <div className="flex items-center gap-2 text-sm text-gray-600">
+        {isMobile && <Smartphone className="w-4 h-4" />}
+        {isTablet && <Tablet className="w-4 h-4" />}
+        {isDesktop && <Monitor className="w-4 h-4" />}
+        <span className="font-medium">
+          {screenSize.width} × {screenSize.height}
+        </span>
+      </div>
+    );
+  };
+
   return (
-    <div className="w-full max-w-7xl mx-auto p-4">
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Canvas Area - Takes up 3 columns */}
-        <div className="lg:col-span-3">
-          <div className="bg-white rounded-lg border-4 border-black shadow-lg p-6">
-            <h3 className="text-3xl font-black mb-6 font-kalam">CUSTOMIZE YOUR MASK</h3>
+    <div className="w-full min-h-screen bg-gradient-to-br from-orange-300 via-orange-400 to-orange-500 p-2 sm:p-4 lg:p-6">
+      <div className={`max-w-7xl mx-auto ${screenSize.isMobile ? 'space-y-4' : 'grid grid-cols-1 lg:grid-cols-4 gap-6'}`}>
+        {/* Canvas Area */}
+        <div className={screenSize.isMobile ? 'order-1' : 'lg:col-span-3'}>
+          <div className="bg-white rounded-lg border-4 border-black shadow-lg p-3 sm:p-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 gap-2">
+              <h3 className="text-xl sm:text-2xl lg:text-3xl font-black font-kalam">
+                CUSTOMIZE YOUR MASK
+              </h3>
+              <DeviceIndicator />
+            </div>
             
             {!uploadedImage ? (
-              <div className="border-4 border-dashed border-gray-300 rounded-lg p-12 text-center h-[600px] flex flex-col items-center justify-center">
+              <div className={`border-4 border-dashed border-gray-300 rounded-lg p-6 sm:p-12 text-center flex flex-col items-center justify-center ${
+                screenSize.isMobile ? 'h-[300px]' : 'h-[400px] lg:h-[600px]'
+              }`}>
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -255,26 +345,31 @@ const MaskCustomizer = () => {
                 />
                 <Button
                   onClick={() => fileInputRef.current?.click()}
-                  className="bg-orange-500 hover:bg-orange-600 text-white font-black border-4 border-black text-xl px-8 py-4"
-                  size="lg"
+                  className="bg-orange-500 hover:bg-orange-600 text-white font-black border-4 border-black text-base sm:text-xl px-4 sm:px-8 py-3 sm:py-4"
+                  size={screenSize.isMobile ? "default" : "lg"}
                 >
-                  <Upload className="mr-2 w-6 h-6" />
+                  <Upload className="mr-2 w-4 h-4 sm:w-6 sm:h-6" />
                   UPLOAD YOUR IMAGE
                 </Button>
-                <p className="mt-6 text-gray-600 font-kalam text-lg">Upload a photo to start adding masks!</p>
+                <p className="mt-4 sm:mt-6 text-gray-600 font-kalam text-sm sm:text-lg text-center px-2">
+                  Upload a photo to start adding masks!
+                </p>
               </div>
             ) : (
-              <div className="border-4 border-black rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center p-4">
+              <div className="border-4 border-black rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center p-2 sm:p-4">
                 <div
                   ref={containerRef}
-                  className="relative bg-white"
+                  className="relative bg-white rounded-lg overflow-hidden shadow-lg"
                   style={{
                     width: displaySize.width,
                     height: displaySize.height,
+                    touchAction: 'none',
                   }}
                   onMouseMove={handleMouseMove}
                   onMouseUp={handleMouseUp}
                   onMouseLeave={handleMouseUp}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleMouseUp}
                 >
                   <img
                     ref={imageRef}
@@ -287,14 +382,13 @@ const MaskCustomizer = () => {
                     }}
                   />
                   
-                  {/* Render traits */}
                   {traits.map(trait => (
                     <img
                       key={trait.id}
                       src={trait.src}
                       alt="Mask trait"
-                      className={`absolute cursor-grab active:cursor-grabbing pointer-events-auto ${
-                        selectedTrait === trait.id ? 'ring-4 ring-yellow-400' : ''
+                      className={`absolute cursor-grab active:cursor-grabbing pointer-events-auto transition-all duration-200 ${
+                        selectedTrait === trait.id ? 'ring-4 ring-yellow-400 ring-opacity-80' : ''
                       }`}
                       style={{
                         left: trait.x,
@@ -305,6 +399,7 @@ const MaskCustomizer = () => {
                         zIndex: 10,
                       }}
                       onMouseDown={(e) => handleMouseDown(e, trait.id)}
+                      onTouchStart={(e) => handleTouchStart(e, trait.id)}
                       draggable={false}
                     />
                   ))}
@@ -315,18 +410,20 @@ const MaskCustomizer = () => {
             )}
 
             {uploadedImage && (
-              <div className="flex gap-3 mt-6">
+              <div className={`flex gap-2 sm:gap-3 mt-4 sm:mt-6 ${
+                screenSize.isMobile ? 'flex-col' : 'flex-row flex-wrap'
+              }`}>
                 <Button
                   onClick={addMaskTrait}
-                  className="bg-green-500 hover:bg-green-600 text-white font-black border-4 border-black text-lg px-6 py-3"
+                  className="bg-green-500 hover:bg-green-600 text-white font-black border-4 border-black text-sm sm:text-lg px-4 sm:px-6 py-2 sm:py-3 flex-1 sm:flex-none"
                 >
-                  <Plus className="mr-2 w-5 h-5" />
+                  <Plus className="mr-2 w-4 h-4 sm:w-5 sm:h-5" />
                   ADD MASK
                 </Button>
                 
                 <Button
                   onClick={downloadImage}
-                  className="bg-blue-500 hover:bg-blue-600 text-white font-black border-4 border-black text-lg px-6 py-3"
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-black border-4 border-black text-sm sm:text-lg px-4 sm:px-6 py-2 sm:py-3 flex-1 sm:flex-none"
                 >
                   DOWNLOAD IMAGE
                 </Button>
@@ -341,7 +438,7 @@ const MaskCustomizer = () => {
                 <Button
                   onClick={() => changeImageInputRef.current?.click()}
                   variant="outline"
-                  className="font-black border-4 border-black text-lg px-6 py-3"
+                  className="font-black border-4 border-black text-sm sm:text-lg px-4 sm:px-6 py-2 sm:py-3 flex-1 sm:flex-none"
                 >
                   CHANGE IMAGE
                 </Button>
@@ -350,15 +447,15 @@ const MaskCustomizer = () => {
           </div>
         </div>
 
-        {/* Controls Panel - Takes up 1 column */}
-        <div className="space-y-4">
-          <div className="bg-yellow-300 rounded-lg border-4 border-black p-4">
-            <h4 className="text-xl font-black mb-4 font-kalam">MASK CONTROLS</h4>
+        {/* Controls Panel */}
+        <div className={`space-y-4 ${screenSize.isMobile ? 'order-2' : ''}`}>
+          <div className="bg-yellow-300 rounded-lg border-4 border-black p-3 sm:p-4">
+            <h4 className="text-lg sm:text-xl font-black mb-3 sm:mb-4 font-kalam">MASK CONTROLS</h4>
             
             {selectedTraitData ? (
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 <div>
-                  <Label className="text-sm font-black">SIZE</Label>
+                  <Label className="text-xs sm:text-sm font-black">SIZE</Label>
                   <Slider
                     value={[selectedTraitData.scale]}
                     onValueChange={([value]) => updateTrait(selectedTrait!, { scale: value })}
@@ -371,7 +468,7 @@ const MaskCustomizer = () => {
                 </div>
 
                 <div>
-                  <Label className="text-sm font-black">ROTATION</Label>
+                  <Label className="text-xs sm:text-sm font-black">ROTATION</Label>
                   <Slider
                     value={[selectedTraitData.rotation]}
                     onValueChange={([value]) => updateTrait(selectedTrait!, { rotation: value })}
@@ -384,7 +481,7 @@ const MaskCustomizer = () => {
                 </div>
 
                 <div>
-                  <Label className="text-sm font-black">OPACITY</Label>
+                  <Label className="text-xs sm:text-sm font-black">OPACITY</Label>
                   <Slider
                     value={[selectedTraitData.opacity]}
                     onValueChange={([value]) => updateTrait(selectedTrait!, { opacity: value })}
@@ -396,43 +493,47 @@ const MaskCustomizer = () => {
                   <span className="text-xs">{Math.round(selectedTraitData.opacity * 100)}%</span>
                 </div>
 
-                <div>
-                  <Label className="text-sm font-black">POSITION X</Label>
-                  <Slider
-                    value={[selectedTraitData.x]}
-                    onValueChange={([value]) => updateTrait(selectedTrait!, { x: value })}
-                    min={-100}
-                    max={800}
-                    step={1}
-                    className="mt-2"
-                  />
-                  <span className="text-xs">{Math.round(selectedTraitData.x)}px</span>
-                </div>
+                {!screenSize.isMobile && (
+                  <>
+                    <div>
+                      <Label className="text-xs sm:text-sm font-black">POSITION X</Label>
+                      <Slider
+                        value={[selectedTraitData.x]}
+                        onValueChange={([value]) => updateTrait(selectedTrait!, { x: value })}
+                        min={-100}
+                        max={displaySize.width + 100}
+                        step={1}
+                        className="mt-2"
+                      />
+                      <span className="text-xs">{Math.round(selectedTraitData.x)}px</span>
+                    </div>
 
-                <div>
-                  <Label className="text-sm font-black">POSITION Y</Label>
-                  <Slider
-                    value={[selectedTraitData.y]}
-                    onValueChange={([value]) => updateTrait(selectedTrait!, { y: value })}
-                    min={-100}
-                    max={600}
-                    step={1}
-                    className="mt-2"
-                  />
-                  <span className="text-xs">{Math.round(selectedTraitData.y)}px</span>
-                </div>
+                    <div>
+                      <Label className="text-xs sm:text-sm font-black">POSITION Y</Label>
+                      <Slider
+                        value={[selectedTraitData.y]}
+                        onValueChange={([value]) => updateTrait(selectedTrait!, { y: value })}
+                        min={-100}
+                        max={displaySize.height + 100}
+                        step={1}
+                        className="mt-2"
+                      />
+                      <span className="text-xs">{Math.round(selectedTraitData.y)}px</span>
+                    </div>
+                  </>
+                )}
 
                 <Button
                   onClick={() => removeTrait(selectedTrait!)}
                   variant="destructive"
-                  className="w-full font-black border-4 border-black"
+                  className="w-full font-black border-4 border-black text-sm sm:text-base"
                 >
-                  <Minus className="mr-2" />
+                  <Minus className="mr-2 w-4 h-4" />
                   REMOVE MASK
                 </Button>
               </div>
             ) : (
-              <p className="text-center text-gray-600 font-kalam">
+              <p className="text-center text-gray-600 font-kalam text-sm sm:text-base">
                 {traits.length === 0 
                   ? "Add a mask to start customizing!" 
                   : "Click on a mask to edit it!"
@@ -443,20 +544,20 @@ const MaskCustomizer = () => {
 
           {/* Trait List */}
           {traits.length > 0 && (
-            <div className="bg-pink-300 rounded-lg border-4 border-black p-4">
-              <h4 className="text-lg font-black mb-2 font-kalam">MASKS</h4>
+            <div className="bg-pink-300 rounded-lg border-4 border-black p-3 sm:p-4">
+              <h4 className="text-base sm:text-lg font-black mb-2 font-kalam">MASKS</h4>
               <div className="space-y-2">
                 {traits.map((trait, index) => (
                   <div
                     key={trait.id}
-                    className={`p-2 rounded border-2 cursor-pointer ${
+                    className={`p-2 rounded border-2 cursor-pointer transition-all ${
                       selectedTrait === trait.id
                         ? 'border-yellow-400 bg-yellow-100'
                         : 'border-black bg-white'
                     }`}
                     onClick={() => setSelectedTrait(trait.id)}
                   >
-                    <span className="font-black text-sm">Mask {index + 1}</span>
+                    <span className="font-black text-xs sm:text-sm">Mask {index + 1}</span>
                   </div>
                 ))}
               </div>

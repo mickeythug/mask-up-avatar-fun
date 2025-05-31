@@ -1,5 +1,6 @@
+
 import React, { useState, useRef } from 'react';
-import { Upload, Copy } from 'lucide-react';
+import { Upload, Copy, Camera, Share2 } from 'lucide-react';
 
 const Index = () => {
   const [uploadedImage, setUploadedImage] = useState<string | null>("/lovable-uploads/a6c183b4-c7ba-4c6b-9745-6e62eb17cdef.png");
@@ -34,193 +35,142 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-orange-400 flex flex-col items-center justify-center p-4 relative">
-      {/* Road Signs */}
-      <div className="absolute top-20 right-20 transform rotate-6 z-10">
-        <div 
-          className="bg-yellow-400 border-8 border-black p-8 shadow-2xl"
-          style={{ 
-            borderRadius: '16px',
-            width: '300px',
-            height: '200px'
-          }}
-        >
-          <div 
-            className="text-black font-black text-4xl text-center flex items-center justify-center h-full"
-            style={{ 
-              fontFamily: 'Impact, Arial Black, sans-serif',
-              letterSpacing: '2px'
-            }}
-          >
-            ARMY OF
-            <br />
-            MASKS
+    <div className="min-h-screen bg-gradient-to-br from-orange-400 via-orange-500 to-red-500 flex flex-col relative overflow-hidden">
+      {/* Mobile App Header */}
+      <div className="sticky top-0 z-50 bg-white/10 backdrop-blur-md border-b border-white/20 px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-yellow-400 rounded-full flex items-center justify-center">
+              <span className="text-black font-black text-sm">M</span>
+            </div>
+            <h1 className="text-white font-bold text-lg">Mask Up</h1>
           </div>
+          <button className="p-2 rounded-full bg-white/20 backdrop-blur-sm">
+            <Share2 size={20} className="text-white" />
+          </button>
         </div>
       </div>
 
-      <div className="absolute bottom-40 left-20 transform -rotate-6 z-10">
-        <div 
-          className="bg-red-600 border-8 border-white p-8 shadow-2xl"
-          style={{ 
-            borderRadius: '16px',
-            width: '280px',
-            height: '200px'
-          }}
-        >
-          <div 
-            className="text-white font-black text-4xl text-center flex items-center justify-center h-full"
-            style={{ 
-              fontFamily: 'Impact, Arial Black, sans-serif',
-              textShadow: '3px 3px 0px rgba(0,0,0,0.8)',
-              letterSpacing: '2px'
-            }}
-          >
-            NO MASK
-            <br />
-            NO ENTRY
-          </div>
+      {/* Main Content */}
+      <div className="flex-1 px-4 py-6 space-y-6">
+        {/* Hero Section */}
+        <div className="text-center space-y-2">
+          <h2 className="text-3xl font-black text-white mb-2" style={{ fontFamily: 'Comic Sans MS, cursive', textShadow: '2px 2px 4px rgba(0,0,0,0.3)' }}>
+            PUT YOUR MASK ON
+          </h2>
+          <p className="text-white/80 text-sm font-medium">Upload your photo and join the army!</p>
         </div>
-      </div>
 
-      <div className="absolute bottom-40 right-20 transform rotate-12 z-10">
-        <div 
-          className="bg-blue-600 border-8 border-white p-8 shadow-2xl"
-          style={{ 
-            borderRadius: '16px',
-            width: '270px',
-            height: '190px'
-          }}
-        >
-          <div 
-            className="text-white font-black text-4xl text-center flex items-center justify-center h-full"
-            style={{ 
-              fontFamily: 'Impact, Arial Black, sans-serif',
-              textShadow: '3px 3px 0px rgba(0,0,0,0.8)',
-              letterSpacing: '2px'
-            }}
-          >
-            PONKE
-            <br />
-            AHEAD
-          </div>
-        </div>
-      </div>
-
-      {/* Main Title */}
-      <div className="mb-8 text-center z-20 relative">
-        <h1 
-          className="text-4xl md:text-6xl font-black text-black mb-2 transform -rotate-1"
-          style={{ 
-            fontFamily: 'Comic Sans MS, cursive',
-            textShadow: '3px 3px 0px rgba(0,0,0,0.3)',
-            letterSpacing: '2px'
-          }}
-        >
-          PUT YOUR MASK ON
-        </h1>
-      </div>
-
-      {/* Image Upload Area */}
-      <div className="relative mb-6 z-20">
-        <div 
-          className="w-80 h-80 bg-orange-200 border-4 border-black transform rotate-1 relative overflow-hidden"
-          style={{ borderRadius: '8px' }}
-        >
-          {uploadedImage ? (
-            <img 
-              src={uploadedImage} 
-              alt="Uploaded" 
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <div 
-                className="w-32 h-20 bg-blue-600 transform -rotate-12 relative"
-                style={{
-                  borderRadius: '50px 50px 20px 20px',
-                  border: '3px solid #1e40af',
-                  boxShadow: '2px 2px 8px rgba(0,0,0,0.3)'
-                }}
-              >
-                {/* Mask straps */}
-                <div className="absolute -left-2 top-1/2 w-6 h-2 bg-blue-600 transform -translate-y-1/2 rotate-45"></div>
-                <div className="absolute -right-2 top-1/2 w-6 h-2 bg-blue-600 transform -translate-y-1/2 -rotate-45"></div>
-                
-                {/* "P" on mask */}
-                <div 
-                  className="absolute inset-0 flex items-center justify-center text-white font-black text-xl"
-                  style={{ fontFamily: 'Comic Sans MS, cursive' }}
-                >
-                  P
+        {/* Image Upload Card */}
+        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/20 shadow-xl">
+          <div className="aspect-square bg-white/20 rounded-2xl overflow-hidden mb-4 relative">
+            {uploadedImage ? (
+              <img 
+                src={uploadedImage} 
+                alt="Your photo" 
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="text-center text-white/60">
+                  <Camera size={48} className="mx-auto mb-2 opacity-60" />
+                  <p className="text-sm font-medium">Tap to add photo</p>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Token Address Section */}
-      <div className="mb-6 w-full max-w-lg z-20 relative">
-        <div 
-          className="bg-orange-500 border-4 border-black p-4 transform -rotate-1 shadow-lg"
-          style={{ borderRadius: '12px' }}
-        >
-          <h3 
-            className="text-lg font-black text-black mb-3 text-center transform rotate-1"
-            style={{ 
-              fontFamily: 'Comic Sans MS, cursive',
-              textShadow: '2px 2px 0px rgba(255,255,255,0.5)',
-              letterSpacing: '1px'
-            }}
-          >
-            TOKEN ADDRESS
-          </h3>
-          <div className="flex items-center gap-2 bg-white p-3 border-2 border-black rounded-lg">
-            <div 
-              className="flex-1 text-sm font-bold text-black break-all"
-              style={{ fontFamily: 'monospace' }}
-            >
-              {tokenAddress}
-            </div>
+            )}
+            {/* Floating Upload Button */}
             <button
-              onClick={copyToClipboard}
-              className="bg-green-500 hover:bg-green-600 text-white p-2 border-2 border-black rounded transform hover:rotate-1 transition-all duration-200 shadow-md"
+              onClick={handleAddImageClick}
+              className="absolute bottom-4 right-4 w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center shadow-lg transform active:scale-95 transition-transform"
             >
-              <Copy size={16} />
+              <Upload size={20} className="text-white" />
             </button>
           </div>
-          {copied && (
-            <div 
-              className="text-center mt-2 text-black font-black transform rotate-2"
-              style={{ 
-                fontFamily: 'Comic Sans MS, cursive',
-                textShadow: '1px 1px 0px rgba(255,255,255,0.5)',
-                fontSize: '14px'
-              }}
+
+          {/* Action Buttons */}
+          <div className="flex space-x-3">
+            <button
+              onClick={handleAddImageClick}
+              className="flex-1 bg-blue-600 text-white font-bold py-4 rounded-2xl flex items-center justify-center space-x-2 transform active:scale-98 transition-transform shadow-lg"
             >
-              COPIED! 🎉
+              <Camera size={20} />
+              <span>Take Photo</span>
+            </button>
+            <button
+              onClick={handleAddImageClick}
+              className="flex-1 bg-purple-600 text-white font-bold py-4 rounded-2xl flex items-center justify-center space-x-2 transform active:scale-98 transition-transform shadow-lg"
+            >
+              <Upload size={20} />
+              <span>Upload</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Token Info Card */}
+        <div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/20 shadow-xl">
+          <h3 className="text-white font-bold text-lg mb-3 text-center">Token Address</h3>
+          <div className="bg-black/20 rounded-2xl p-4 mb-4">
+            <p className="text-white/90 text-xs font-mono break-all text-center leading-relaxed">
+              {tokenAddress}
+            </p>
+          </div>
+          <button
+            onClick={copyToClipboard}
+            className="w-full bg-green-600 text-white font-bold py-4 rounded-2xl flex items-center justify-center space-x-2 transform active:scale-98 transition-transform shadow-lg"
+          >
+            <Copy size={20} />
+            <span>{copied ? 'Copied! 🎉' : 'Copy Address'}</span>
+          </button>
+        </div>
+
+        {/* Info Cards */}
+        <div className="grid grid-cols-1 gap-4">
+          <div className="bg-yellow-400/20 backdrop-blur-md rounded-2xl p-4 border border-yellow-400/30">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-yellow-400 rounded-full flex items-center justify-center">
+                <span className="text-black font-black">💪</span>
+              </div>
+              <div>
+                <h4 className="text-white font-bold">Army of Masks</h4>
+                <p className="text-white/70 text-sm">Join the revolution!</p>
+              </div>
             </div>
-          )}
+          </div>
+
+          <div className="bg-red-600/20 backdrop-blur-md rounded-2xl p-4 border border-red-600/30">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center">
+                <span className="text-white font-black">🚫</span>
+              </div>
+              <div>
+                <h4 className="text-white font-bold">No Mask No Entry</h4>
+                <p className="text-white/70 text-sm">Protection required</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-blue-600/20 backdrop-blur-md rounded-2xl p-4 border border-blue-600/30">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                <span className="text-white font-black">🐸</span>
+              </div>
+              <div>
+                <h4 className="text-white font-bold">Ponke Ahead</h4>
+                <p className="text-white/70 text-sm">Adventure awaits</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Add Image Button */}
-      <button
-        onClick={handleAddImageClick}
-        className="bg-red-500 hover:bg-red-600 text-white font-black py-4 px-8 border-4 border-black transform -rotate-1 hover:rotate-0 transition-transform duration-200 shadow-lg z-20 relative"
-        style={{ 
-          fontFamily: 'Comic Sans MS, cursive',
-          fontSize: '18px',
-          letterSpacing: '1px',
-          borderRadius: '8px'
-        }}
-      >
-        <div className="flex items-center gap-2">
-          <Upload size={24} />
-          ADD IMAGE
+      {/* Bottom Navigation/Actions */}
+      <div className="sticky bottom-0 bg-white/10 backdrop-blur-md border-t border-white/20 px-4 py-4 space-y-3">
+        <div className="flex justify-center space-x-4">
+          <div className="w-2 h-2 bg-white rounded-full"></div>
+          <div className="w-2 h-2 bg-white/50 rounded-full"></div>
+          <div className="w-2 h-2 bg-white/50 rounded-full"></div>
         </div>
-      </button>
+      </div>
 
       {/* Hidden file input */}
       <input

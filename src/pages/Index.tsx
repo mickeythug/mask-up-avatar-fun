@@ -1,10 +1,32 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import PFPDownloader from '../components/PFPDownloader';
 import ContractAddress from '../components/ContractAddress';
 import Socials from '../components/Socials';
+import MaskCustomizer from '../components/MaskCustomizer';
+import { Button } from '../components/ui/button';
 
 const Index = () => {
+  const [showCustomizer, setShowCustomizer] = useState(false);
+
+  if (showCustomizer) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-300 via-orange-400 to-orange-500 p-4">
+        {/* Back button */}
+        <div className="mb-4">
+          <Button
+            onClick={() => setShowCustomizer(false)}
+            className="bg-black text-white font-black border-4 border-white hover:bg-gray-800"
+          >
+            ← BACK TO HOME
+          </Button>
+        </div>
+        
+        <MaskCustomizer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-300 via-orange-400 to-orange-500 relative">
       {/* Socials in top corner */}
@@ -57,12 +79,28 @@ const Index = () => {
             </div>
           </div>
 
-          {/* Download Section */}
-          <div className="flex flex-col items-center px-4">
-            <h3 className="text-black text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black mb-4 sm:mb-6 md:mb-8 tracking-wide">
-              GET RANDOM PFP
-            </h3>
-            <PFPDownloader />
+          {/* Action Buttons */}
+          <div className="flex flex-col items-center px-4 space-y-6">
+            {/* Custom Mask Creator */}
+            <div className="text-center">
+              <h3 className="text-black text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black mb-4 tracking-wide">
+                CREATE YOUR MASK
+              </h3>
+              <Button
+                onClick={() => setShowCustomizer(true)}
+                className="bg-red-500 hover:bg-red-600 text-white text-lg sm:text-xl md:text-2xl font-black px-8 py-4 rounded-2xl border-4 border-black shadow-2xl transform hover:scale-105 transition-transform"
+              >
+                PUT YOUR MASK ON
+              </Button>
+            </div>
+
+            {/* Random PFP Generator */}
+            <div className="text-center">
+              <h3 className="text-black text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black mb-4 tracking-wide">
+                GET RANDOM PFP
+              </h3>
+              <PFPDownloader />
+            </div>
           </div>
         </div>
       </div>

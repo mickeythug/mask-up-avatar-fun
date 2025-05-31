@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Slider } from './ui/slider';
@@ -187,7 +186,7 @@ const MaskCustomizer = () => {
             <h3 className="text-3xl font-black mb-6 font-kalam">CUSTOMIZE YOUR MASK</h3>
             
             {!uploadedImage ? (
-              <div className="border-4 border-dashed border-gray-300 rounded-lg p-12 text-center min-h-[600px] flex flex-col items-center justify-center">
+              <div className="border-4 border-dashed border-gray-300 rounded-lg p-12 text-center h-[700px] flex flex-col items-center justify-center">
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -206,20 +205,18 @@ const MaskCustomizer = () => {
                 <p className="mt-6 text-gray-600 font-kalam text-lg">Upload a photo to start adding masks!</p>
               </div>
             ) : (
-              <div className="border-4 border-black rounded-lg overflow-hidden bg-gray-100 min-h-[600px]">
+              <div className="border-4 border-black rounded-lg overflow-hidden bg-gray-100 h-[700px]">
                 <div
                   className="relative w-full h-full flex items-center justify-center"
                   onMouseMove={handleMouseMove}
                   onMouseUp={handleMouseUp}
                   onMouseLeave={handleMouseUp}
-                  style={{ minHeight: '600px' }}
                 >
                   <img
                     ref={imageRef}
                     src={uploadedImage}
                     alt="Uploaded"
-                    className="max-w-full max-h-[600px] object-contain"
-                    style={{ width: 'auto', height: 'auto' }}
+                    className="w-full h-full object-cover"
                   />
                   
                   {/* Render traits */}

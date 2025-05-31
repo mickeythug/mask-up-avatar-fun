@@ -26,40 +26,33 @@ const Index = () => {
   // Get device-specific styles
   const getContainerStyles = () => {
     switch (deviceType) {
-      case 'mobile':
-        return "min-h-screen bg-orange-400 flex flex-col w-full max-w-full mx-auto";
+      case 'desktop':
+        return "min-h-screen bg-orange-400 flex flex-col w-full max-w-lg mx-auto shadow-2xl border-x-4 border-black";
       case 'tablet':
         return "min-h-screen bg-orange-400 flex flex-col w-full max-w-2xl mx-auto";
-      case 'desktop':
-        return "min-h-screen bg-orange-400 flex flex-col w-full max-w-md mx-auto shadow-2xl";
+      case 'mobile':
+        return "min-h-screen bg-orange-400 flex flex-col w-full max-w-full mx-auto";
       default:
-        return "min-h-screen bg-orange-400 flex flex-col w-full max-w-sm mx-auto";
+        return "min-h-screen bg-orange-400 flex flex-col w-full max-w-lg mx-auto";
     }
-  };
-
-  const getStatusBarStyles = () => {
-    if (deviceType === 'desktop') {
-      return "hidden"; // Hide status bar on desktop
-    }
-    return "flex justify-between items-center px-4 py-3 text-black font-bold text-sm";
   };
 
   const getTitleStyles = () => {
     switch (deviceType) {
-      case 'mobile':
+      case 'desktop':
         return {
-          title1: "text-black text-xl font-black mb-2 tracking-wide",
-          title2: "text-black text-4xl font-black tracking-wider transform -rotate-2"
+          title1: "text-black text-4xl font-black mb-4 tracking-wide",
+          title2: "text-black text-7xl font-black tracking-wider transform -rotate-2"
         };
       case 'tablet':
         return {
           title1: "text-black text-2xl font-black mb-2 tracking-wide",
           title2: "text-black text-5xl font-black tracking-wider transform -rotate-2"
         };
-      case 'desktop':
+      case 'mobile':
         return {
-          title1: "text-black text-3xl font-black mb-3 tracking-wide",
-          title2: "text-black text-6xl font-black tracking-wider transform -rotate-2"
+          title1: "text-black text-xl font-black mb-2 tracking-wide",
+          title2: "text-black text-4xl font-black tracking-wider transform -rotate-2"
         };
       default:
         return {
@@ -71,12 +64,12 @@ const Index = () => {
 
   const getImageAreaStyles = () => {
     switch (deviceType) {
-      case 'mobile':
-        return "w-full max-w-[300px] aspect-square bg-orange-200 border-3 border-black mb-4 flex items-center justify-center relative overflow-hidden cursor-pointer hover:bg-orange-300 transition-colors";
-      case 'tablet':
-        return "w-full max-w-[400px] aspect-square bg-orange-200 border-4 border-black mb-6 flex items-center justify-center relative overflow-hidden cursor-pointer hover:bg-orange-300 transition-colors";
       case 'desktop':
-        return "w-full max-w-[500px] aspect-square bg-orange-200 border-4 border-black mb-8 flex items-center justify-center relative overflow-hidden cursor-pointer hover:bg-orange-300 transition-colors shadow-lg";
+        return "w-full max-w-[400px] aspect-square bg-orange-200 border-4 border-black mb-8 flex items-center justify-center relative overflow-hidden cursor-pointer hover:bg-orange-300 transition-colors shadow-xl rounded-lg";
+      case 'tablet':
+        return "w-full max-w-[350px] aspect-square bg-orange-200 border-4 border-black mb-6 flex items-center justify-center relative overflow-hidden cursor-pointer hover:bg-orange-300 transition-colors";
+      case 'mobile':
+        return "w-full max-w-[280px] aspect-square bg-orange-200 border-3 border-black mb-4 flex items-center justify-center relative overflow-hidden cursor-pointer hover:bg-orange-300 transition-colors";
       default:
         return "w-full max-w-[280px] aspect-square bg-orange-200 border-2 border-black mb-4 flex items-center justify-center relative overflow-hidden cursor-pointer hover:bg-orange-300 transition-colors";
     }
@@ -84,12 +77,12 @@ const Index = () => {
 
   const getButtonStyles = () => {
     switch (deviceType) {
-      case 'mobile':
-        return "w-full max-w-[300px] bg-red-500 text-white text-lg font-black py-3 border-3 border-black tracking-wider hover:bg-red-600 transition-colors";
-      case 'tablet':
-        return "w-full max-w-[400px] bg-red-500 text-white text-xl font-black py-4 border-4 border-black tracking-wider hover:bg-red-600 transition-colors";
       case 'desktop':
-        return "w-full max-w-[500px] bg-red-500 text-white text-2xl font-black py-5 border-4 border-black tracking-wider hover:bg-red-600 transition-colors shadow-lg hover:shadow-xl";
+        return "w-full max-w-[400px] bg-red-500 text-white text-2xl font-black py-6 border-4 border-black tracking-wider hover:bg-red-600 transition-colors shadow-xl rounded-lg hover:shadow-2xl transform hover:-translate-y-1";
+      case 'tablet':
+        return "w-full max-w-[350px] bg-red-500 text-white text-xl font-black py-4 border-4 border-black tracking-wider hover:bg-red-600 transition-colors";
+      case 'mobile':
+        return "w-full max-w-[280px] bg-red-500 text-white text-lg font-black py-3 border-3 border-black tracking-wider hover:bg-red-600 transition-colors";
       default:
         return "w-full max-w-[280px] bg-red-500 text-white text-base font-black py-2 border-2 border-black tracking-wider hover:bg-red-600 transition-colors";
     }
@@ -97,14 +90,14 @@ const Index = () => {
 
   const getPaddingStyles = () => {
     switch (deviceType) {
-      case 'mobile':
-        return "px-4 lg:px-6";
-      case 'tablet':
-        return "px-6 lg:px-8";
       case 'desktop':
-        return "px-8 lg:px-12";
+        return "px-12 py-8";
+      case 'tablet':
+        return "px-8 py-6";
+      case 'mobile':
+        return "px-4 py-4";
       default:
-        return "px-4";
+        return "px-4 py-4";
     }
   };
 
@@ -112,32 +105,34 @@ const Index = () => {
 
   return (
     <div className={getContainerStyles()}>
-      {/* Status Bar - Only show on mobile/tablet */}
-      <div className={getStatusBarStyles()}>
-        <span>16:06</span>
-        <div className="flex items-center space-x-1">
-          <div className="flex space-x-1">
-            <div className="w-1 h-3 bg-black"></div>
-            <div className="w-1 h-3 bg-black"></div>
-            <div className="w-1 h-3 bg-black opacity-50"></div>
-            <div className="w-1 h-3 bg-black opacity-25"></div>
-          </div>
-          <span className="ml-2 text-sm">5G</span>
-          <div className="bg-black text-white px-1 rounded text-xs font-bold">79</div>
-        </div>
-      </div>
-
-      {/* Back Arrow - Only show on mobile/tablet */}
+      {/* Status Bar - Hide on desktop */}
       {deviceType !== 'desktop' && (
-        <div className={`${getPaddingStyles()} py-2`}>
+        <div className="flex justify-between items-center px-4 py-3 text-black font-bold text-sm">
+          <span>16:06</span>
+          <div className="flex items-center space-x-1">
+            <div className="flex space-x-1">
+              <div className="w-1 h-3 bg-black"></div>
+              <div className="w-1 h-3 bg-black"></div>
+              <div className="w-1 h-3 bg-black opacity-50"></div>
+              <div className="w-1 h-3 bg-black opacity-25"></div>
+            </div>
+            <span className="ml-2 text-sm">5G</span>
+            <div className="bg-black text-white px-1 rounded text-xs font-bold">79</div>
+          </div>
+        </div>
+      )}
+
+      {/* Back Arrow - Hide on desktop */}
+      {deviceType !== 'desktop' && (
+        <div className="px-4 py-2">
           <ArrowLeft size={24} className="text-black" />
         </div>
       )}
 
       {/* Main Content */}
-      <div className={`flex-1 flex flex-col items-center ${getPaddingStyles()}`}>
+      <div className={`flex-1 flex flex-col items-center justify-center ${getPaddingStyles()}`}>
         {/* Title */}
-        <div className={`text-center ${deviceType === 'mobile' ? 'mb-6 mt-2' : deviceType === 'tablet' ? 'mb-8 mt-4' : 'mb-12 mt-8'}`}>
+        <div className={`text-center ${deviceType === 'desktop' ? 'mb-16' : deviceType === 'tablet' ? 'mb-8' : 'mb-6'}`}>
           <h1 className={titleStyles.title1}>
             PUT ON A
           </h1>
@@ -167,7 +162,7 @@ const Index = () => {
         </button>
       </div>
 
-      {/* Bottom Browser Bar - Only show on mobile/tablet */}
+      {/* Bottom Browser Bar - Hide on desktop */}
       {deviceType !== 'desktop' && (
         <div className="bg-gray-800 bg-opacity-80 text-white py-2 px-4 flex items-center justify-center">
           <div className="flex items-center space-x-3">

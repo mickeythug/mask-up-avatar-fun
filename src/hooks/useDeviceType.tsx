@@ -9,18 +9,25 @@ export const useDeviceType = (): DeviceType => {
   useEffect(() => {
     const checkDeviceType = () => {
       const width = window.innerWidth;
-      const userAgent = navigator.userAgent;
+      const userAgent = navigator.userAgent.toLowerCase();
       
-      // Check user agent for mobile devices
-      const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+      console.log('Screen width:', width);
+      console.log('User agent:', userAgent);
       
-      // Combined check: user agent and screen width
-      if (isMobile || width < 768) {
-        setDeviceType('mobile');
+      // More precise mobile detection
+      const isMobileDevice = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile/i.test(userAgent);
+      const isTabletDevice = /ipad|tablet|kindle|silk|playbook/i.test(userAgent);
+      
+      // Desktop first approach - if it's a large screen and not explicitly mobile/tablet
+      if (width >= 1024 && !isMobileDevice && !isTabletDevice) {
+        console.log('Setting to desktop');
+        setDeviceType('desktop');
       } else if (width >= 768 && width < 1024) {
+        console.log('Setting to tablet');
         setDeviceType('tablet');
       } else {
-        setDeviceType('desktop');
+        console.log('Setting to mobile');
+        setDeviceType('mobile');
       }
     };
 
@@ -33,5 +40,6 @@ export const useDeviceType = (): DeviceType => {
     return () => window.removeEventListener('resize', checkDeviceType);
   }, []);
 
+  console.log('Current device type:', deviceType);
   return deviceType;
 };

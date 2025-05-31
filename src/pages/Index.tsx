@@ -48,7 +48,7 @@ const Index = () => {
         {/* Title */}
         <div className="text-center mb-8 mt-4">
           <h1 className="text-black text-2xl font-black mb-2 tracking-wide">
-            PUT ON A HELMET
+            PUT ON A
           </h1>
           <h2 className="text-black text-6xl font-black tracking-wider transform -rotate-2">
             MASK
@@ -60,20 +60,11 @@ const Index = () => {
           className="w-full max-w-sm aspect-square bg-orange-200 border-4 border-black mb-6 flex items-center justify-center relative overflow-hidden"
           onClick={handleAddImageClick}
         >
-          {uploadedImage ? (
-            <img 
-              src={uploadedImage} 
-              alt="Your masked face" 
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-24 h-16 relative">
-              {/* Simple mask illustration */}
-              <div className="w-full h-full bg-green-600 rounded-t-full border-4 border-black relative">
-                <div className="absolute top-1/3 left-1/3 w-3 h-3 bg-yellow-400 rounded-full border-2 border-black"></div>
-              </div>
-            </div>
-          )}
+          <img 
+            src="/lovable-uploads/ca0e8d90-37ff-41fb-aa6b-c1c79b3f94f0.png" 
+            alt="Cat with mask" 
+            className="w-full h-full object-cover"
+          />
         </div>
 
         {/* Add Image Button */}

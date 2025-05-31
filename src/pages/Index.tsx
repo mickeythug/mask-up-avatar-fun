@@ -1,8 +1,9 @@
+
 import React, { useState, useRef } from 'react';
 import { Upload, Copy } from 'lucide-react';
 
 const Index = () => {
-  const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [uploadedImage, setUploadedImage] = useState<string | null>("/lovable-uploads/a6c183b4-c7ba-4c6b-9745-6e62eb17cdef.png");
   const [copied, setCopied] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 

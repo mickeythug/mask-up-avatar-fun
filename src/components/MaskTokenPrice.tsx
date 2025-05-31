@@ -70,7 +70,7 @@ const MaskTokenPrice = () => {
         <div className="flex items-center space-x-3">
           {/* Token Symbol */}
           <div className="bg-black text-white px-3 py-1 rounded-full">
-            <span className="text-sm font-black">MASK</span>
+            <span className="text-sm font-black">$MASK</span>
           </div>
           
           {/* Market Cap Label */}

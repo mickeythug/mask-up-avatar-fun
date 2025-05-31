@@ -1,3 +1,4 @@
+
 import React from 'react';
 import PFPDownloader from '../components/PFPDownloader';
 import ContractAddress from '../components/ContractAddress';
@@ -8,6 +9,20 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-br from-orange-300 via-orange-400 to-orange-500 relative">
       {/* Socials in top corner */}
       <Socials />
+      
+      {/* Motivational text banner */}
+      <div className="absolute top-16 left-8 transform -rotate-12 z-10">
+        <div className="bg-yellow-300 border-4 border-black px-6 py-3 rounded-2xl shadow-2xl">
+          <p className="text-black text-xl sm:text-2xl md:text-3xl font-black tracking-wider transform rotate-1" 
+             style={{ fontFamily: 'Comic Sans MS, cursive' }}>
+            PUT YOUR MASK ON
+          </p>
+          <p className="text-black text-lg sm:text-xl md:text-2xl font-black tracking-wider transform -rotate-1" 
+             style={{ fontFamily: 'Comic Sans MS, cursive' }}>
+            AND JOIN THE ARMY!
+          </p>
+        </div>
+      </div>
       
       <div className="flex items-center justify-center p-4 sm:p-6 md:p-8 min-h-screen">
         <div className="w-full max-w-4xl mx-auto text-center">

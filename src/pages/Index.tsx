@@ -1,10 +1,13 @@
 
 import React, { useState, useRef } from 'react';
-import { Upload } from 'lucide-react';
+import { Upload, Copy } from 'lucide-react';
 
 const Index = () => {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const tokenAddress = "6MQpbiTC2YcogidTmKqMLK82qvE9z5QEm7EP3AEDpump";
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -21,8 +24,63 @@ const Index = () => {
     fileInputRef.current?.click();
   };
 
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(tokenAddress);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-orange-400 flex flex-col items-center justify-center p-4">
+      {/* Token Address Section */}
+      <div className="mb-6 w-full max-w-lg">
+        <div 
+          className="bg-purple-500 border-4 border-black p-4 transform -rotate-1 shadow-lg"
+          style={{ borderRadius: '12px' }}
+        >
+          <h3 
+            className="text-lg font-black text-white mb-3 text-center transform rotate-1"
+            style={{ 
+              fontFamily: 'Comic Sans MS, cursive',
+              textShadow: '2px 2px 0px rgba(0,0,0,0.5)',
+              letterSpacing: '1px'
+            }}
+          >
+            TOKEN ADDRESS
+          </h3>
+          <div className="flex items-center gap-2 bg-white p-3 border-2 border-black rounded-lg">
+            <div 
+              className="flex-1 text-sm font-bold text-black break-all"
+              style={{ fontFamily: 'monospace' }}
+            >
+              {tokenAddress}
+            </div>
+            <button
+              onClick={copyToClipboard}
+              className="bg-green-500 hover:bg-green-600 text-white p-2 border-2 border-black rounded transform hover:rotate-1 transition-all duration-200 shadow-md"
+            >
+              <Copy size={16} />
+            </button>
+          </div>
+          {copied && (
+            <div 
+              className="text-center mt-2 text-white font-black transform rotate-2"
+              style={{ 
+                fontFamily: 'Comic Sans MS, cursive',
+                textShadow: '1px 1px 0px rgba(0,0,0,0.5)',
+                fontSize: '14px'
+              }}
+            >
+              COPIED! 🎉
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Main Title */}
       <div className="mb-8 text-center">
         <h1 

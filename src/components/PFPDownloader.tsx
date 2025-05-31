@@ -3,30 +3,16 @@ import React from 'react';
 import { Download } from 'lucide-react';
 
 const PFP_IMAGES = [
-  {
-    id: 1,
-    url: 'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9?w=400&h=400&fit=crop&crop=face',
-    name: 'fruit-pfp.jpg'
-  },
-  {
-    id: 2,
-    url: 'https://images.unsplash.com/photo-1582562124811-c09040d0a901?w=400&h=400&fit=crop&crop=face',
-    name: 'cat-pfp.jpg'
-  },
-  {
-    id: 3,
-    url: 'https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=400&h=400&fit=crop&crop=face',
-    name: 'kitten-pfp.jpg'
-  },
-  {
-    id: 4,
-    url: 'https://images.unsplash.com/photo-1501286353178-1ec881214838?w=400&h=400&fit=crop&crop=face',
-    name: 'monkey-pfp.jpg'
-  }
+  // All images removed from bucket
 ];
 
 const PFPDownloader = () => {
   const downloadRandomPFP = async () => {
+    if (PFP_IMAGES.length === 0) {
+      console.log('No PFP images available for download');
+      return;
+    }
+    
     const randomImage = PFP_IMAGES[Math.floor(Math.random() * PFP_IMAGES.length)];
     
     try {

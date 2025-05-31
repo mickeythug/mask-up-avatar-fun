@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Slider } from './ui/slider';
@@ -36,29 +37,29 @@ const MaskCustomizer = () => {
     img.onload = () => {
       setImageSize({ width: img.width, height: img.height });
       
-      // Calculate display dimensions that fit well in the container
-      const maxWidth = 800;
-      const maxHeight = 600;
+      // Calculate much larger display dimensions
+      const maxWidth = 1200; // Increased from 800
+      const maxHeight = 900;  // Increased from 600
       const aspectRatio = img.width / img.height;
       
       let displayWidth = img.width;
       let displayHeight = img.height;
       
-      // Scale down if image is too large
+      // Scale to fit the larger container while maintaining aspect ratio
       if (displayWidth > maxWidth || displayHeight > maxHeight) {
         if (aspectRatio > 1) {
           // Landscape
-          displayWidth = Math.min(maxWidth, displayWidth);
+          displayWidth = maxWidth;
           displayHeight = displayWidth / aspectRatio;
         } else {
           // Portrait
-          displayHeight = Math.min(maxHeight, displayHeight);
+          displayHeight = maxHeight;
           displayWidth = displayHeight * aspectRatio;
         }
       }
       
-      // Ensure minimum size for usability
-      const minSize = 400;
+      // Ensure good minimum size for visibility
+      const minSize = 600; // Increased from 400
       if (displayWidth < minSize && displayHeight < minSize) {
         if (aspectRatio > 1) {
           displayWidth = minSize;
@@ -237,15 +238,15 @@ const MaskCustomizer = () => {
   const selectedTraitData = traits.find(t => t.id === selectedTrait);
 
   return (
-    <div className="w-full max-w-7xl mx-auto p-4">
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Canvas Area - Takes up 3 columns */}
-        <div className="lg:col-span-3">
+    <div className="w-full max-w-full mx-auto p-4">
+      <div className="grid grid-cols-1 xl:grid-cols-5 gap-6">
+        {/* Canvas Area - Takes up 4 columns on xl screens */}
+        <div className="xl:col-span-4">
           <div className="bg-white rounded-lg border-4 border-black shadow-lg p-6">
             <h3 className="text-3xl font-black mb-6 font-kalam">CUSTOMIZE YOUR MASK</h3>
             
             {!uploadedImage ? (
-              <div className="border-4 border-dashed border-gray-300 rounded-lg p-12 text-center h-[600px] flex flex-col items-center justify-center">
+              <div className="border-4 border-dashed border-gray-300 rounded-lg p-12 text-center min-h-[800px] flex flex-col items-center justify-center">
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -264,13 +265,15 @@ const MaskCustomizer = () => {
                 <p className="mt-6 text-gray-600 font-kalam text-lg">Upload a photo to start adding masks!</p>
               </div>
             ) : (
-              <div className="border-4 border-black rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center p-4">
+              <div className="border-4 border-black rounded-lg overflow-hidden bg-gray-50 flex items-center justify-center p-8">
                 <div
                   ref={containerRef}
-                  className="relative bg-white"
+                  className="relative bg-white shadow-2xl rounded-lg overflow-hidden"
                   style={{
                     width: displaySize.width,
                     height: displaySize.height,
+                    minWidth: '600px',
+                    minHeight: '400px',
                   }}
                   onMouseMove={handleMouseMove}
                   onMouseUp={handleMouseUp}

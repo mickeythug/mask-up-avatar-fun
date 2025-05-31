@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Upload, Copy } from 'lucide-react';
 
@@ -36,18 +35,18 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-orange-400 flex flex-col items-center justify-center p-4 relative">
-      {/* Road Signs - Much Larger and More Visible */}
+      {/* Road Signs */}
       <div className="absolute top-20 right-20 transform rotate-6 z-10">
         <div 
           className="bg-yellow-400 border-8 border-black p-8 shadow-2xl"
           style={{ 
             borderRadius: '16px',
-            width: '200px',
-            height: '140px'
+            width: '300px',
+            height: '200px'
           }}
         >
           <div 
-            className="text-black font-black text-2xl text-center flex items-center justify-center h-full"
+            className="text-black font-black text-4xl text-center flex items-center justify-center h-full"
             style={{ 
               fontFamily: 'Impact, Arial Black, sans-serif',
               letterSpacing: '2px'
@@ -65,12 +64,12 @@ const Index = () => {
           className="bg-red-600 border-8 border-white p-8 shadow-2xl"
           style={{ 
             borderRadius: '16px',
-            width: '180px',
-            height: '140px'
+            width: '280px',
+            height: '200px'
           }}
         >
           <div 
-            className="text-white font-black text-2xl text-center flex items-center justify-center h-full"
+            className="text-white font-black text-4xl text-center flex items-center justify-center h-full"
             style={{ 
               fontFamily: 'Impact, Arial Black, sans-serif',
               textShadow: '3px 3px 0px rgba(0,0,0,0.8)',
@@ -89,12 +88,12 @@ const Index = () => {
           className="bg-blue-600 border-8 border-white p-8 shadow-2xl"
           style={{ 
             borderRadius: '16px',
-            width: '170px',
-            height: '130px'
+            width: '270px',
+            height: '190px'
           }}
         >
           <div 
-            className="text-white font-black text-2xl text-center flex items-center justify-center h-full"
+            className="text-white font-black text-4xl text-center flex items-center justify-center h-full"
             style={{ 
               fontFamily: 'Impact, Arial Black, sans-serif',
               textShadow: '3px 3px 0px rgba(0,0,0,0.8)',
@@ -129,36 +128,11 @@ const Index = () => {
           style={{ borderRadius: '8px' }}
         >
           {uploadedImage ? (
-            <div className="relative w-full h-full">
-              <img 
-                src={uploadedImage} 
-                alt="Uploaded" 
-                className="w-full h-full object-cover"
-              />
-              {/* Mask Overlay */}
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div 
-                  className="w-32 h-20 bg-blue-600 transform -rotate-12 relative"
-                  style={{
-                    borderRadius: '50px 50px 20px 20px',
-                    border: '3px solid #1e40af',
-                    boxShadow: '2px 2px 8px rgba(0,0,0,0.3)'
-                  }}
-                >
-                  {/* Mask straps */}
-                  <div className="absolute -left-2 top-1/2 w-6 h-2 bg-blue-600 transform -translate-y-1/2 rotate-45"></div>
-                  <div className="absolute -right-2 top-1/2 w-6 h-2 bg-blue-600 transform -translate-y-1/2 -rotate-45"></div>
-                  
-                  {/* "P" on mask */}
-                  <div 
-                    className="absolute inset-0 flex items-center justify-center text-white font-black text-xl"
-                    style={{ fontFamily: 'Comic Sans MS, cursive' }}
-                  >
-                    P
-                  </div>
-                </div>
-              </div>
-            </div>
+            <img 
+              src={uploadedImage} 
+              alt="Uploaded" 
+              className="w-full h-full object-cover"
+            />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <div 

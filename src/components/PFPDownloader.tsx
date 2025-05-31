@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Download, X } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
@@ -109,21 +110,21 @@ const PFPDownloader = () => {
       </button>
 
       <Dialog open={showPreview} onOpenChange={setShowPreview}>
-        <DialogContent className="sm:max-w-md bg-orange-100 border-4 border-black">
-          <div className="flex flex-col items-center space-y-4">
+        <DialogContent className="sm:max-w-2xl bg-orange-100 border-4 border-black">
+          <div className="flex flex-col items-center space-y-6">
             <button
               onClick={closePreview}
               className="absolute top-4 right-4 p-1 rounded-md hover:bg-gray-200"
             >
-              <X size={20} />
+              <X size={24} />
             </button>
             
-            <h3 className="text-2xl font-black text-black tracking-wide">
+            <h3 className="text-3xl font-black text-black tracking-wide">
               PREVIEW
             </h3>
             
             {previewImage && (
-              <div className="w-64 h-64 border-4 border-black rounded-xl overflow-hidden shadow-xl">
+              <div className="w-80 h-80 sm:w-96 sm:h-96 md:w-[28rem] md:h-[28rem] border-4 border-black rounded-xl overflow-hidden shadow-xl">
                 <img 
                   src={previewImage.url} 
                   alt={previewImage.name}
@@ -132,16 +133,16 @@ const PFPDownloader = () => {
               </div>
             )}
             
-            <div className="flex gap-4">
+            <div className="flex gap-6">
               <button
                 onClick={downloadCurrentPFP}
-                className="bg-green-500 text-white font-black py-2 px-6 border-2 border-black rounded-lg hover:bg-green-600 transition-colors shadow-lg"
+                className="bg-green-500 text-white font-black py-3 px-8 border-2 border-black rounded-lg hover:bg-green-600 transition-colors shadow-lg text-lg"
               >
                 DOWNLOAD
               </button>
               <button
                 onClick={closePreview}
-                className="bg-gray-500 text-white font-black py-2 px-6 border-2 border-black rounded-lg hover:bg-gray-600 transition-colors shadow-lg"
+                className="bg-gray-500 text-white font-black py-3 px-8 border-2 border-black rounded-lg hover:bg-gray-600 transition-colors shadow-lg text-lg"
               >
                 CANCEL
               </button>

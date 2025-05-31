@@ -3,37 +3,37 @@ import React, { useState, useEffect } from 'react';
 import { ArrowUp, ArrowDown } from 'lucide-react';
 
 interface TokenData {
-  price: number;
+  marketCap: number;
   change24h: number;
   isLoading: boolean;
 }
 
 const MaskTokenPrice = () => {
   const [tokenData, setTokenData] = useState<TokenData>({
-    price: 0,
+    marketCap: 0,
     change24h: 0,
     isLoading: true
   });
 
   // Simulerar realtidsdata - ersätt med riktig API-anrop
   useEffect(() => {
-    const fetchTokenPrice = () => {
+    const fetchTokenData = () => {
       // Simulerad data - ersätt med riktig API
-      const mockPrice = 0.00123 + (Math.random() - 0.5) * 0.0001;
+      const mockMarketCap = 1500000 + (Math.random() - 0.5) * 100000;
       const mockChange = (Math.random() - 0.5) * 20;
       
       setTokenData({
-        price: mockPrice,
+        marketCap: mockMarketCap,
         change24h: mockChange,
         isLoading: false
       });
     };
 
     // Initial fetch
-    fetchTokenPrice();
+    fetchTokenData();
 
     // Update every 30 seconds
-    const interval = setInterval(fetchTokenPrice, 30000);
+    const interval = setInterval(fetchTokenData, 30000);
 
     return () => clearInterval(interval);
   }, []);
@@ -41,13 +41,23 @@ const MaskTokenPrice = () => {
   const isPositive = tokenData.change24h >= 0;
   const ArrowIcon = isPositive ? ArrowUp : ArrowDown;
 
+  const formatMarketCap = (marketCap: number) => {
+    if (marketCap >= 1000000) {
+      return `$${(marketCap / 1000000).toFixed(2)}M`;
+    } else if (marketCap >= 1000) {
+      return `$${(marketCap / 1000).toFixed(1)}K`;
+    } else {
+      return `$${marketCap.toFixed(0)}`;
+    }
+  };
+
   if (tokenData.isLoading) {
     return (
       <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-20">
         <div className="bg-orange-200 border-4 border-black px-6 py-3 rounded-2xl shadow-2xl">
           <div className="flex items-center space-x-3">
             <div className="w-6 h-6 bg-black rounded-full animate-pulse"></div>
-            <span className="text-black text-lg font-black">Loading MASK price...</span>
+            <span className="text-black text-lg font-black">Loading MASK market cap...</span>
           </div>
         </div>
       </div>
@@ -63,10 +73,15 @@ const MaskTokenPrice = () => {
             <span className="text-sm font-black">MASK</span>
           </div>
           
-          {/* Price */}
+          {/* Market Cap Label */}
+          <div className="text-black">
+            <span className="text-xs font-black">MARKET CAP</span>
+          </div>
+          
+          {/* Market Cap Value */}
           <div className="text-black">
             <span className="text-lg font-black">
-              ${tokenData.price.toFixed(6)}
+              {formatMarketCap(tokenData.marketCap)}
             </span>
           </div>
           

@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import PFPDownloader from '../components/PFPDownloader';
 import ContractAddress from '../components/ContractAddress';
@@ -20,6 +21,20 @@ const Index = () => {
           <p className="text-black text-lg sm:text-xl md:text-2xl font-black tracking-wider transform -rotate-1" 
              style={{ fontFamily: 'Comic Sans MS, cursive' }}>
             AND JOIN THE ARMY!
+          </p>
+        </div>
+      </div>
+
+      {/* Second motivational text banner */}
+      <div className="absolute bottom-32 right-8 transform rotate-12 z-10">
+        <div className="bg-pink-300 border-4 border-black px-6 py-3 rounded-2xl shadow-2xl">
+          <p className="text-black text-xl sm:text-2xl md:text-3xl font-black tracking-wider transform -rotate-2" 
+             style={{ fontFamily: 'Comic Sans MS, cursive' }}>
+            STAY STRONG
+          </p>
+          <p className="text-black text-lg sm:text-xl md:text-2xl font-black tracking-wider transform rotate-1" 
+             style={{ fontFamily: 'Comic Sans MS, cursive' }}>
+            HODL FOREVER!
           </p>
         </div>
       </div>
@@ -64,3 +79,4 @@ const Index = () => {
 };
 
 export default Index;
+

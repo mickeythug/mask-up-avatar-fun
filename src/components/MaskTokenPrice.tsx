@@ -54,10 +54,10 @@ const MaskTokenPrice = () => {
   if (tokenData.isLoading) {
     return (
       <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-20">
-        <div className="bg-orange-200 border-4 border-black px-6 py-3 rounded-2xl shadow-2xl">
+        <div className="bg-green-200 border-4 border-black px-6 py-3 rounded-2xl shadow-2xl">
           <div className="flex items-center space-x-3">
             <div className="w-6 h-6 bg-black rounded-full animate-pulse"></div>
-            <span className="text-black text-lg font-black">Loading MASK market cap...</span>
+            <span className="text-black text-lg font-black">Loading BANDANA market cap...</span>
           </div>
         </div>
       </div>
@@ -70,7 +70,7 @@ const MaskTokenPrice = () => {
         <div className="flex items-center space-x-3">
           {/* Token Symbol */}
           <div className="bg-black text-white px-3 py-1 rounded-full">
-            <span className="text-sm font-black">$MASK</span>
+            <span className="text-sm font-black">$BANDANA</span>
           </div>
           
           {/* Market Cap Label */}

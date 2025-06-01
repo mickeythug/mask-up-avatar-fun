@@ -12,7 +12,7 @@ const Index = () => {
 
   if (showCustomizer) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-300 via-orange-400 to-orange-500 p-4">
+      <div className="min-h-screen bg-gradient-to-br from-green-300 via-green-400 to-green-500 p-4">
         {/* Back button */}
         <div className="mb-4">
           <Button
@@ -29,7 +29,7 @@ const Index = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-300 via-orange-400 to-orange-500 relative">
+    <div className="min-h-screen bg-gradient-to-br from-green-300 via-green-400 to-green-500 relative">
       {/* MASK Token Price - Top Center */}
       <MaskTokenPrice />
       
@@ -40,7 +40,7 @@ const Index = () => {
       <div className="absolute top-16 left-8 transform -rotate-12 z-10">
         <div className="bg-yellow-300 border-4 border-black px-6 py-3 rounded-2xl shadow-2xl">
           <p className="text-black text-xl sm:text-2xl md:text-3xl font-black tracking-wider transform rotate-1 font-comic">
-            PUT YOUR MASK ON
+            PUT YOUR BANDANA ON
           </p>
           <p className="text-black text-lg sm:text-xl md:text-2xl font-black tracking-wider transform -rotate-1 font-comic">
             AND JOIN THE ARMY!
@@ -68,16 +68,16 @@ const Index = () => {
               PUT ON A
             </h1>
             <h2 className="text-black text-4xl sm:text-6xl md:text-8xl lg:text-[12rem] font-black tracking-wider transform -rotate-2 px-2">
-              MASK
+              BANDANA
             </h2>
           </div>
 
           {/* Static Image Display */}
           <div className="mb-8 sm:mb-12 md:mb-16">
-            <div className="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 mx-auto bg-orange-200 border-4 sm:border-6 md:border-8 border-black flex items-center justify-center relative overflow-hidden shadow-2xl rounded-2xl sm:rounded-3xl">
+            <div className="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 mx-auto bg-green-200 border-4 sm:border-6 md:border-8 border-black flex items-center justify-center relative overflow-hidden shadow-2xl rounded-2xl sm:rounded-3xl">
               <img 
-                src="/lovable-uploads/ca0e8d90-37ff-41fb-aa6b-c1c79b3f94f0.png" 
-                alt="Cat with mask" 
+                src="/lovable-uploads/a364f50b-c3a9-4abd-b46f-d0e6f734f226.png" 
+                alt="Otter with bandana" 
                 className="w-full h-full object-cover rounded-xl sm:rounded-2xl"
               />
             </div>
@@ -88,13 +88,13 @@ const Index = () => {
             {/* Custom Mask Creator */}
             <div className="text-center">
               <h3 className="text-black text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black mb-4 tracking-wide">
-                CREATE YOUR MASK
+                CREATE YOUR BANDANA
               </h3>
               <Button
                 onClick={() => setShowCustomizer(true)}
                 className="bg-red-500 hover:bg-red-600 text-white text-lg sm:text-xl md:text-2xl font-black px-8 py-4 rounded-2xl border-4 border-black shadow-2xl transform hover:scale-105 transition-transform"
               >
-                PUT YOUR MASK ON
+                PUT YOUR BANDANA ON
               </Button>
             </div>
 
